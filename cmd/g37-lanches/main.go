@@ -1,15 +1,28 @@
 package main
 
 import (
+	"fmt"
+	"g37-lanchonete/configs"
 	"g37-lanchonete/internal/application"
+	"g37-lanchonete/internal/domain/models"
 	"g37-lanchonete/internal/domain/services"
+	"g37-lanchonete/internal/infra/clients"
 	"g37-lanchonete/internal/infra/repositories"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
-	customerRepository := repositories.NewcustomerRepository()
+	config := configs.NewConfig()
+	appConfig, err := config.ReadConfig()
+	if err != nil {
+		panic(err)
+	}
+
+	postgresSQLClient := createPostgresSQLClient(appConfig)
+	customerRepository := repositories.NewcustomerRepository(postgresSQLClient)
 
 	customerService := services.NewCustomerService(customerRepository)
 
@@ -28,5 +41,22 @@ func main() {
 	}
 
 	router.Run(":8080")
+}
 
+func createPostgresSQLClient(appConfig configs.AppConfig) clients.SQLClient {
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		appConfig.DatabaseHost,
+		appConfig.DatabaseUser,
+		appConfig.DatabasePassword,
+		appConfig.DatabaseName,
+		appConfig.DatabasePort,
+		appConfig.DatabaseSSLMode)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+	db.AutoMigrate(&models.Customer{})
+
+	return clients.NewPostgresClient(db)
 }
