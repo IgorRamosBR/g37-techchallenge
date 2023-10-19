@@ -1,7 +1,10 @@
 package models
 
+import "gorm.io/gorm"
+
 type Customer struct {
-	Name  string
-	Cpf   string
-	Email string
+	gorm.Model
+	Name  string `gorm:"size:100"`
+	Cpf   string `gorm:"size:11"`
+	Email string `gorm:"size:100"`
 }

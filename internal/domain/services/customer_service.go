@@ -3,6 +3,9 @@ package services
 import (
 	"g37-lanchonete/internal/domain/models"
 	"g37-lanchonete/internal/domain/ports"
+	"g37-lanchonete/internal/domain/services/dto"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type customerService struct {
@@ -15,7 +18,15 @@ func NewCustomerService(customerRepository ports.CustomerRepository) ports.Custo
 	}
 }
 
-func (s customerService) CreateCustomer(customer models.Customer) error {
+func (s customerService) CreateCustomer(customerDTO dto.CustomerDTO) error {
+	customer := customerDTO.ToCustomer()
+
+	err := s.customerRepository.SaveCustomer(customer)
+	if err != nil {
+		log.Errorf("failed to save customer, error: %v", err)
+		return err
+	}
+
 	return nil
 }
 
