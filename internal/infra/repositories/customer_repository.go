@@ -1,18 +1,27 @@
 package repositories
 
 import (
+	"fmt"
 	"g37-lanchonete/internal/domain/models"
 	"g37-lanchonete/internal/domain/ports"
+	"g37-lanchonete/internal/infra/clients"
 )
 
 type customerRepository struct {
+	client clients.SQLClient
 }
 
-func NewcustomerRepository() ports.CustomerRepository {
-	return customerRepository{}
+func NewcustomerRepository(client clients.SQLClient) ports.CustomerRepository {
+	return customerRepository{
+		client: client,
+	}
 }
 
 func (r customerRepository) SaveCustomer(customer models.Customer) error {
+	err := r.client.Save(&customer)
+	if err != nil {
+		return fmt.Errorf("failed to save customer, error %v", err)
+	}
 
 	return nil
 }
