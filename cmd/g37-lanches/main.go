@@ -32,7 +32,7 @@ func main() {
 	v1 := router.Group("/v1")
 	{
 		v1.GET("/customers", applicationHandler.GetCustomers)
-		v1.POST("/customers")
+		v1.POST("/customers", applicationHandler.SaveCustomer)
 
 		v1.GET("/products")
 		v1.POST("/products")

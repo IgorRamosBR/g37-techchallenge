@@ -1,8 +1,6 @@
 package clients
 
 import (
-	"database/sql"
-
 	"gorm.io/gorm"
 )
 
@@ -25,17 +23,22 @@ func NewPostgresClient(db *gorm.DB) SQLClient {
 	}
 }
 
-func (c postgresClient) FindAll(entity interface{}) (*sql.Rows, error) {
-	result := c.db.Find(entity)
+func (c postgresClient) Find(entity interface{}, query string, values ...any) error {
+	result := c.db.Where(query, values).First(entity)
 	if result.Error != nil {
-		return nil, result.Error
+		return result.Error
 	}
 
-	rows, err := result.Rows()
-	if err != nil {
-		return nil, err
+	return nil
+}
+
+func (c postgresClient) FindAll(entity interface{}) error {
+	result := c.db.Find(entity)
+	if result.Error != nil {
+		return result.Error
 	}
-	return rows, nil
+
+	return nil
 }
 
 func (c postgresClient) Save(entity interface{}) error {

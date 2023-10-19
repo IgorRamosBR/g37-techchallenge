@@ -1,6 +1,7 @@
 package application
 
 import (
+	"errors"
 	"g37-lanchonete/internal/domain/ports"
 	"g37-lanchonete/internal/domain/services/dto"
 	"net/http"
@@ -43,6 +44,9 @@ func (h CustomerHandler) SaveCustomer(c *gin.Context) {
 
 func (h CustomerHandler) GetCustomers(c *gin.Context) {
 	cpf := c.Query("cpf")
+	if cpf == "" {
+		handleBadRequestResponse(c, "cpf query parameter is required", errors.New("cpf is missing"))
+	}
 
 	customer, err := h.customerService.GetCustomerByCPF(cpf)
 	if err != nil {
