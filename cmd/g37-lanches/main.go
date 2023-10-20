@@ -23,21 +23,24 @@ func main() {
 
 	postgresSQLClient := createPostgresSQLClient(appConfig)
 	customerRepository := repositories.NewcustomerRepository(postgresSQLClient)
+	productRepository := repositories.NewProductRepository(postgresSQLClient)
 
 	customerService := services.NewCustomerService(customerRepository)
+	productService := services.NewProductService(productRepository)
 
-	applicationHandler := application.NewCustomerHandler(customerService)
+	customerHandler := application.NewCustomerHandler(customerService)
+	productHandler := application.NewProductHandler(productService)
 
 	router := gin.Default()
 	v1 := router.Group("/v1")
 	{
-		v1.GET("/customers", applicationHandler.GetCustomers)
-		v1.POST("/customers", applicationHandler.SaveCustomer)
+		v1.GET("/customers", customerHandler.GetCustomers)
+		v1.POST("/customers", customerHandler.SaveCustomer)
 
-		v1.GET("/products")
-		v1.POST("/products")
-		v1.PUT("/products")
-		v1.DELETE("/products")
+		v1.GET("/products", productHandler.GetProducts)
+		v1.POST("/products", productHandler.CreateProducts)
+		v1.PUT("/products", productHandler.UpdateProduct)
+		v1.DELETE("/products", productHandler.DeleteProduct)
 	}
 
 	router.Run(":8080")

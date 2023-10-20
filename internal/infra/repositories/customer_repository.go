@@ -25,10 +25,11 @@ func (r customerRepository) SaveCustomer(customer models.Customer) error {
 
 	return nil
 }
+
 func (r customerRepository) FindCustomerByCPF(cpf string) (models.Customer, error) {
 	customer := models.Customer{Cpf: cpf}
 
-	err := r.client.Find(customer, "cpf = ?", cpf)
+	err := r.client.Find(&customer, "cpf = ?", cpf)
 	if err != nil {
 		return models.Customer{}, fmt.Errorf("failed to find customer by cpf [%s], error %v", cpf, err)
 	}
