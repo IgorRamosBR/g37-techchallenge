@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"g37-lanchonete/internal/domain/models"
 	"g37-lanchonete/internal/domain/ports"
+	"g37-lanchonete/internal/domain/services/dto"
 	"g37-lanchonete/internal/infra/clients"
+	"strconv"
 )
 
 type productRepository struct {
@@ -18,9 +20,9 @@ func NewProductRepository(client clients.SQLClient) ports.ProductRepository {
 	}
 }
 
-func (r productRepository) FindAllProducts() ([]models.Product, error) {
+func (r productRepository) FindAllProducts(pageParams dto.PageParams) ([]models.Product, error) {
 	var products []models.Product
-	err := r.client.FindAll(&products)
+	err := r.client.FindAll(&products, pageParams.GetLimit(), pageParams.GetOffset())
 	if err != nil {
 		return nil, fmt.Errorf("failed to find all products, error %v", err)
 	}
@@ -28,9 +30,9 @@ func (r productRepository) FindAllProducts() ([]models.Product, error) {
 	return products, nil
 }
 
-func (r productRepository) FindProductsByCategory(category string) ([]models.Product, error) {
+func (r productRepository) FindProductsByCategory(pageParams dto.PageParams, category string) ([]models.Product, error) {
 	var products []models.Product
-	err := r.client.Find(&products, "category = ?", category)
+	err := r.client.Find(&products, pageParams.GetLimit(), pageParams.GetOffset(), "category = ?", category)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find products by id, error %v", err)
 	}
@@ -49,7 +51,7 @@ func (r productRepository) SaveProduct(product models.Product) error {
 
 func (r productRepository) UpdateProduct(id uint, product models.Product) error {
 	var oldProduct models.Product
-	err := r.client.FindById(id, &oldProduct)
+	err := r.client.FindById(strconv.FormatUint(uint64(id), 10), &oldProduct)
 	if err != nil {
 		if errors.Is(err, clients.ErrNotFound) {
 			return fmt.Errorf("product [%d] not found, error %v", id, err)
