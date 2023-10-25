@@ -30,6 +30,16 @@ func (s customerService) CreateCustomer(customerDTO dto.CustomerDTO) error {
 	return nil
 }
 
+func (s customerService) GetCustomerById(id string) (models.Customer, error) {
+	customer, err := s.customerRepository.FindCustomerById(id)
+	if err != nil {
+		log.Errorf("failed to get customer by id [%s], error: %v", id, err)
+		return models.Customer{}, err
+	}
+
+	return customer, nil
+}
+
 func (s customerService) GetCustomerByCPF(cpf string) (models.Customer, error) {
 	customer, err := s.customerRepository.FindCustomerByCPF(cpf)
 	if err != nil {

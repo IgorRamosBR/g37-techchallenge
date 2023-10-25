@@ -19,24 +19,26 @@ func NewProductService(productRepository ports.ProductRepository) ports.ProductS
 	}
 }
 
-func (s productService) GetAllProducts() ([]models.Product, error) {
-	products, err := s.productRepository.FindAllProducts()
+func (s productService) GetAllProducts(pageParameters dto.PageParams) (dto.Page[models.Product], error) {
+	products, err := s.productRepository.FindAllProducts(pageParameters)
 	if err != nil {
 		log.Errorf("failed to get all products, error: %v", err)
-		return nil, err
+		return dto.Page[models.Product]{}, err
 	}
 
-	return products, nil
+	page := dto.BuildPage[models.Product](products, pageParameters)
+	return page, nil
 }
 
-func (s productService) GetProductsByCategory(category string) ([]models.Product, error) {
-	products, err := s.productRepository.FindProductsByCategory(category)
+func (s productService) GetProductsByCategory(pageParameters dto.PageParams, category string) (dto.Page[models.Product], error) {
+	products, err := s.productRepository.FindProductsByCategory(pageParameters, category)
 	if err != nil {
 		log.Errorf("failed to get products by category, error: %v", err)
-		return nil, err
+		return dto.Page[models.Product]{}, err
 	}
 
-	return products, nil
+	page := dto.BuildPage[models.Product](products, pageParameters)
+	return page, nil
 }
 
 func (s productService) CreateProduct(productDTO dto.ProductDTO) error {
