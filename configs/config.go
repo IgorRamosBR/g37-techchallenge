@@ -12,12 +12,21 @@ type Config struct {
 }
 
 type AppConfig struct {
+	Environment string
+
 	DatabaseHost     string
 	DatabasePort     string
 	DatabaseName     string
 	DatabaseUser     string
 	DatabasePassword string
 	DatabaseSSLMode  string
+
+	SQSRegion   string
+	SQSEndpoint string
+
+	PaymentBrokerURL string
+	NotificationURL  string
+	SponsorId        string
 }
 
 func NewConfig() *Config {
@@ -73,12 +82,21 @@ func (c *Config) setupEnvironment() {
 func (c *Config) extractConfigVars() (AppConfig, error) {
 	appConfig := AppConfig{}
 
+	appConfig.Environment = c.viper.GetString("ENVIRONMENT")
+
 	appConfig.DatabaseHost = c.viper.GetString("postgres.host")
 	appConfig.DatabasePort = c.viper.GetString("postgres.port")
 	appConfig.DatabaseName = c.viper.GetString("postgres.dbname")
 	appConfig.DatabaseSSLMode = c.viper.GetString("postgres.sslmode")
 	appConfig.DatabaseUser = c.viper.GetString("postgres.user")
 	appConfig.DatabasePassword = c.viper.GetString("postgres.portpassword")
+
+	appConfig.SQSRegion = c.viper.GetString("sqs.region")
+	appConfig.SQSEndpoint = c.viper.GetString("sqs.endpoint")
+
+	appConfig.PaymentBrokerURL = c.viper.GetString("paymentBroker.url")
+	appConfig.NotificationURL = c.viper.GetString("paymentBroker.notificationUrl")
+	appConfig.SponsorId = c.viper.GetString("paymentBroker.sponsorId")
 
 	return appConfig, nil
 }

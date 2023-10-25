@@ -5,3 +5,12 @@ postgres:
   dbname: g37_lanches
   user: postgres
   password: admin
+
+sqs:
+  region: us-east-1
+  endpoint: https://localhost:5432/queue
+
+paymentBroker:
+  url: https://api.mercadopago.com/instore/orders/qr/seller/collectors/teste/pos/123/qrs
+  notificationUrl: https://g37-lanches/payment
+  sponsorId: "12345"

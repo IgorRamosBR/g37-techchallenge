@@ -21,11 +21,17 @@ func NewProductHandler(productService ports.ProductService) ProductHandler {
 
 func (h ProductHandler) GetProducts(c *gin.Context) {
 	category := c.Query("category")
+	pageParams, err := getPageParams(c)
+	if err != nil {
+		handleBadRequestResponse(c, "invalid query parameters", err)
+	}
+
 	if category != "" {
-		h.getProductsByCategory(c, category)
+		h.getProductsByCategory(c, pageParams, category)
 		return
 	}
-	h.getAllProducts(c)
+
+	h.getAllProducts(c, pageParams)
 }
 
 func (h ProductHandler) CreateProducts(c *gin.Context) {
@@ -96,8 +102,8 @@ func (h ProductHandler) DeleteProduct(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func (h ProductHandler) getAllProducts(c *gin.Context) {
-	products, err := h.productService.GetAllProducts()
+func (h ProductHandler) getAllProducts(c *gin.Context, pageParameters dto.PageParams) {
+	products, err := h.productService.GetAllProducts(pageParameters)
 	if err != nil {
 		handleInternalServerResponse(c, "failed to get all products", err)
 		return
@@ -105,8 +111,8 @@ func (h ProductHandler) getAllProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, products)
 }
 
-func (h ProductHandler) getProductsByCategory(c *gin.Context, category string) {
-	products, err := h.productService.GetProductsByCategory(category)
+func (h ProductHandler) getProductsByCategory(c *gin.Context, pageParameters dto.PageParams, category string) {
+	products, err := h.productService.GetProductsByCategory(pageParameters, category)
 	if err != nil {
 		handleInternalServerResponse(c, "failed to get products by category", err)
 		return
