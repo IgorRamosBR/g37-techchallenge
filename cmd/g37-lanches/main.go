@@ -74,7 +74,7 @@ func createPostgresSQLClient(appConfig configs.AppConfig) clients.SQLClient {
 	if err != nil {
 		panic("failed to connect database")
 	}
-	db.AutoMigrate(&domain.Customer{})
+	db.AutoMigrate(&domain.Customer{}, &domain.Order{}, &domain.OrderItem{}, &domain.Product{})
 
 	return clients.NewPostgresClient(db)
 }
