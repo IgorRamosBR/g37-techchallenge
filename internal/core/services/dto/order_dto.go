@@ -54,11 +54,11 @@ func (o OrderDTO) ToOrder(customer domain.Customer) domain.Order {
 	}
 
 	return domain.Order{
-		Items:    orderItems,
-		Coupon:   o.Coupon,
-		Discount: o.Discount,
-		Customer: customer,
-		Status:   string(o.OrderStatus),
+		Items:      orderItems,
+		Coupon:     o.Coupon,
+		Discount:   o.Discount,
+		CustomerID: customer.ID,
+		Status:     string(o.OrderStatus),
 	}
 }
 

@@ -8,13 +8,15 @@ type Order struct {
 	Coupon      string
 	Discount    float64
 	TotalAmount float64
-	Customer    Customer
+	CustomerID  uint
 	Status      string
 }
 
 type OrderItem struct {
 	gorm.Model
-	Product  Product
-	Quantity int
-	Type     string
+	ProductID uint
+	Product   Product `gorm:"foreignKey:ProductID;references:ID"`
+	Quantity  int
+	Type      string
+	OrderID   uint
 }

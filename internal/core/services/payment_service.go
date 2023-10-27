@@ -65,7 +65,7 @@ func (p paymentService) createPaymentRequest(order domain.Order) dto.PaymentQRCo
 
 	return dto.PaymentQRCodeRequest{
 		ExternalReference: strconv.FormatUint(uint64(order.ID), 10),
-		Title:             fmt.Sprintf("Order %d for the Customer[%d]", order.ID, order.Customer.ID),
+		Title:             fmt.Sprintf("Order %d for the Customer[%d]", order.ID, order.CustomerID),
 		NotificationURL:   p.notificationUrl,
 		TotalAmount:       order.TotalAmount,
 		Items:             items,
