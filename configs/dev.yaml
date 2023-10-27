@@ -3,7 +3,7 @@ postgres:
   port: 5432
   sslmode: disable
   dbname: g37_lanches
-  user: postgres
+  user: admin
   password: admin
 
 sqs:

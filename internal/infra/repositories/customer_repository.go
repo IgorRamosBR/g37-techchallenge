@@ -11,7 +11,7 @@ type customerRepository struct {
 	client clients.SQLClient
 }
 
-func NewcustomerRepository(client clients.SQLClient) ports.CustomerRepository {
+func NewCustomerRepository(client clients.SQLClient) ports.CustomerRepository {
 	return customerRepository{
 		client: client,
 	}

@@ -7,13 +7,15 @@ services:
       - ~/apps/postgres:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=admin
-      - POSTGRES_USER=postgres
+      - POSTGRES_USER=admin
       - POSTGRES_DB=g37_lanches
   localstack:
-   image: localstack/localstack
-   container_name: localstack
-   network_mode: bridge
-   ports:
-     — "4566:4566"
-   volumes:
-     — "/var/run/docker.sock:/var/run/docker.sock"
+    image: localstack/localstack
+    container_name: localstack
+    ports:
+      - "4566:4566" # LocalStack SQS
+    environment:
+      - SERVICES=sqs
+      - DEFAULT_REGION=us-east-1
+    volumes:
+      - ./data:/tmp/localstack

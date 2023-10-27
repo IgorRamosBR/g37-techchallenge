@@ -24,16 +24,15 @@ func main() {
 		panic(err)
 	}
 
+	httpClient := clients.NewHttpClient()
 	postgresSQLClient := createPostgresSQLClient(appConfig)
 	queue := createQueue(appConfig)
+	paymentBroker := clients.NewMercadoPagoBroker(httpClient, appConfig.PaymentBrokerURL)
 
-	customerRepository := repositories.NewcustomerRepository(postgresSQLClient)
+	customerRepository := repositories.NewCustomerRepository(postgresSQLClient)
 	productRepository := repositories.NewProductRepository(postgresSQLClient)
 	orderRepository := repositories.NewOrderRepository(postgresSQLClient)
 	paymentOrderRepository := repositories.NewPaymentOrderRepository(queue)
-
-	httpClient := clients.NewHttpClient()
-	paymentBroker := clients.NewMercadoPagoBroker(httpClient, appConfig.PaymentBrokerURL)
 
 	customerService := services.NewCustomerService(customerRepository)
 	productService := services.NewProductService(productRepository)

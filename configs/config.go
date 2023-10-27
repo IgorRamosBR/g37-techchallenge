@@ -72,7 +72,6 @@ func (c *Config) setupEnvironment() {
 	c.viper = viper.New()
 	c.viper.AutomaticEnv()
 
-	// Next, Read yaml config file based on the AF_ENVIRONMENT
 	environment := c.viper.GetString("ENVIRONMENT")
 	log.Infof("ENVIRONMENT %s", environment)
 	c.viper.SetConfigType("yaml")
@@ -89,7 +88,7 @@ func (c *Config) extractConfigVars() (AppConfig, error) {
 	appConfig.DatabaseName = c.viper.GetString("postgres.dbname")
 	appConfig.DatabaseSSLMode = c.viper.GetString("postgres.sslmode")
 	appConfig.DatabaseUser = c.viper.GetString("postgres.user")
-	appConfig.DatabasePassword = c.viper.GetString("postgres.portpassword")
+	appConfig.DatabasePassword = c.viper.GetString("postgres.password")
 
 	appConfig.SQSRegion = c.viper.GetString("sqs.region")
 	appConfig.SQSEndpoint = c.viper.GetString("sqs.endpoint")
