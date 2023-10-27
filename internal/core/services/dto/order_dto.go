@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"g37-lanchonete/internal/domain/models"
+	"g37-lanchonete/internal/core/domain"
 
 	"github.com/asaskevich/govalidator"
 )
@@ -31,8 +31,8 @@ type OrderItemDTO struct {
 	Type     OrderItemType `json:"orderStatus" valid:"string,required~Type is required|in(UNIT|COMBO|CUSTOM_COMBO)~Type is invalid"`
 }
 
-func (o OrderItemDTO) toOrderItem() models.OrderItem {
-	return models.OrderItem{
+func (o OrderItemDTO) toOrderItem() domain.OrderItem {
+	return domain.OrderItem{
 		Product:  o.Product.ToProduct(),
 		Quantity: o.Quantity,
 		Type:     string(o.Type),
@@ -47,13 +47,13 @@ type OrderDTO struct {
 	OrderStatus OrderStatus `json:"orderStatus" valid:"string,required~OrderStatus is required|in(CREATED|PAID|RECEIVED|IN_PROGRESS|READY|DONE)~OrderStatus is invalid"`
 }
 
-func (o OrderDTO) ToOrder(customer models.Customer) models.Order {
-	orderItems := make([]models.OrderItem, len(o.Items))
+func (o OrderDTO) ToOrder(customer domain.Customer) domain.Order {
+	orderItems := make([]domain.OrderItem, len(o.Items))
 	for i, item := range o.Items {
 		orderItems[i] = item.toOrderItem()
 	}
 
-	return models.Order{
+	return domain.Order{
 		Items:    orderItems,
 		Coupon:   o.Coupon,
 		Discount: o.Discount,

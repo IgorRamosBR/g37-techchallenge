@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"g37-lanchonete/configs"
 	"g37-lanchonete/internal/application"
-	"g37-lanchonete/internal/domain/models"
-	"g37-lanchonete/internal/domain/services"
+	"g37-lanchonete/internal/core/domain"
+	"g37-lanchonete/internal/core/services"
 	"g37-lanchonete/internal/infra/clients"
 	"g37-lanchonete/internal/infra/repositories"
 
@@ -74,7 +74,7 @@ func createPostgresSQLClient(appConfig configs.AppConfig) clients.SQLClient {
 	if err != nil {
 		panic("failed to connect database")
 	}
-	db.AutoMigrate(&models.Customer{})
+	db.AutoMigrate(&domain.Customer{})
 
 	return clients.NewPostgresClient(db)
 }

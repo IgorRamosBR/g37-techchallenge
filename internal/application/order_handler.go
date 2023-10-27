@@ -1,8 +1,8 @@
 package application
 
 import (
-	"g37-lanchonete/internal/domain/ports"
-	"g37-lanchonete/internal/domain/services/dto"
+	"g37-lanchonete/internal/core/ports"
+	"g37-lanchonete/internal/core/services/dto"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

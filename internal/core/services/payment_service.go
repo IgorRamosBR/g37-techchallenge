@@ -2,16 +2,16 @@ package services
 
 import (
 	"fmt"
-	"g37-lanchonete/internal/domain/models"
-	"g37-lanchonete/internal/domain/ports"
-	"g37-lanchonete/internal/domain/services/dto"
+	"g37-lanchonete/internal/core/domain"
+	"g37-lanchonete/internal/core/ports"
+	"g37-lanchonete/internal/core/services/dto"
 	"strconv"
 
 	log "github.com/sirupsen/logrus"
 )
 
 type PaymentService interface {
-	ProcessPayment(order models.Order) (string, error)
+	ProcessPayment(order domain.Order) (string, error)
 }
 
 type paymentService struct {
@@ -30,14 +30,14 @@ func NewPaymentService(notificationUrl, sponsorId string, paymentBroker ports.Pa
 	}
 }
 
-func (p paymentService) ProcessPayment(order models.Order) (string, error) {
+func (p paymentService) ProcessPayment(order domain.Order) (string, error) {
 	qrcode, err := p.generatePaymentQRCode(order)
 	if err != nil {
 		log.Errorf("failed to generate payment qrcode for the order [%d], error: %v", order.ID, err)
 		return "", err
 	}
 
-	paymentOrder := models.PaymentOrder{Order: strconv.FormatUint(uint64(order.ID), 10)}
+	paymentOrder := domain.PaymentOrder{Order: strconv.FormatUint(uint64(order.ID), 10)}
 	err = p.paymentOrderRepository.SavePaymentOrder(paymentOrder)
 	if err != nil {
 		log.Errorf("failed to save payment order for the order [%d], error: %v", order.ID, err)
@@ -47,7 +47,7 @@ func (p paymentService) ProcessPayment(order models.Order) (string, error) {
 	return qrcode, nil
 }
 
-func (p paymentService) generatePaymentQRCode(order models.Order) (string, error) {
+func (p paymentService) generatePaymentQRCode(order domain.Order) (string, error) {
 	paymentRequest := p.createPaymentRequest(order)
 	paymentResponse, err := p.paymentBroker.GeneratePaymentQRCode(paymentRequest)
 	if err != nil {
@@ -57,7 +57,7 @@ func (p paymentService) generatePaymentQRCode(order models.Order) (string, error
 	return paymentResponse.QrData, nil
 }
 
-func (p paymentService) createPaymentRequest(order models.Order) dto.PaymentQRCodeRequest {
+func (p paymentService) createPaymentRequest(order domain.Order) dto.PaymentQRCodeRequest {
 	items := make([]dto.PaymentItemRequest, len(order.Items))
 	for i, item := range order.Items {
 		items[i] = createPaymentItem(item)
@@ -73,7 +73,7 @@ func (p paymentService) createPaymentRequest(order models.Order) dto.PaymentQRCo
 	}
 }
 
-func createPaymentItem(item models.OrderItem) dto.PaymentItemRequest {
+func createPaymentItem(item domain.OrderItem) dto.PaymentItemRequest {
 	return dto.PaymentItemRequest{
 		SkuNumber:   item.Product.SkuId,
 		Category:    item.Product.Category,

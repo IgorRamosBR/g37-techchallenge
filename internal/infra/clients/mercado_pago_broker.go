@@ -3,8 +3,8 @@ package clients
 import (
 	"encoding/json"
 	"fmt"
-	"g37-lanchonete/internal/domain/ports"
-	"g37-lanchonete/internal/domain/services/dto"
+	"g37-lanchonete/internal/core/ports"
+	"g37-lanchonete/internal/core/services/dto"
 )
 
 type mercadoPagoBroker struct {

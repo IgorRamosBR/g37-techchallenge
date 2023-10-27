@@ -2,7 +2,7 @@ package dto
 
 import (
 	"fmt"
-	"g37-lanchonete/internal/domain/models"
+	"g37-lanchonete/internal/core/domain"
 	"strings"
 
 	"github.com/asaskevich/govalidator"
@@ -14,8 +14,8 @@ type CustomerDTO struct {
 	CPF   string `json:"cpf" valid:"cpf"`
 }
 
-func (c CustomerDTO) ToCustomer() models.Customer {
-	return models.Customer{
+func (c CustomerDTO) ToCustomer() domain.Customer {
+	return domain.Customer{
 		Name:  c.Name,
 		Cpf:   c.CPF,
 		Email: c.Email,

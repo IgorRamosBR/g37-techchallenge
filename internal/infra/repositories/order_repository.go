@@ -3,9 +3,9 @@ package repositories
 import (
 	"errors"
 	"fmt"
-	"g37-lanchonete/internal/domain/models"
-	"g37-lanchonete/internal/domain/ports"
-	"g37-lanchonete/internal/domain/services/dto"
+	"g37-lanchonete/internal/core/domain"
+	"g37-lanchonete/internal/core/ports"
+	"g37-lanchonete/internal/core/services/dto"
 	"g37-lanchonete/internal/infra/clients"
 	"strconv"
 )
@@ -20,8 +20,8 @@ func NewOrderRepository(client clients.SQLClient) ports.OrderRepository {
 	}
 }
 
-func (r orderRepository) FindAllOrders(pageParams dto.PageParams) ([]models.Order, error) {
-	var orders []models.Order
+func (r orderRepository) FindAllOrders(pageParams dto.PageParams) ([]domain.Order, error) {
+	var orders []domain.Order
 	err := r.client.FindAll(&orders, pageParams.GetLimit(), pageParams.GetOffset())
 	if err != nil {
 		return nil, fmt.Errorf("failed to find all orders, error %v", err)
@@ -30,7 +30,7 @@ func (r orderRepository) FindAllOrders(pageParams dto.PageParams) ([]models.Orde
 	return orders, nil
 }
 
-func (r orderRepository) SaveOrder(order models.Order) error {
+func (r orderRepository) SaveOrder(order domain.Order) error {
 	err := r.client.Save(&order)
 	if err != nil {
 		return fmt.Errorf("failed to save order, error %v", err)
@@ -39,8 +39,8 @@ func (r orderRepository) SaveOrder(order models.Order) error {
 	return nil
 }
 
-func (r orderRepository) UpdateOrder(id uint, order models.Order) error {
-	var oldOrder models.Order
+func (r orderRepository) UpdateOrder(id uint, order domain.Order) error {
+	var oldOrder domain.Order
 	err := r.client.FindById(strconv.FormatUint(uint64(id), 10), &oldOrder)
 	if err != nil {
 		if errors.Is(err, clients.ErrNotFound) {

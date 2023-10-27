@@ -1,9 +1,9 @@
 package services
 
 import (
-	"g37-lanchonete/internal/domain/models"
-	"g37-lanchonete/internal/domain/ports"
-	"g37-lanchonete/internal/domain/services/dto"
+	"g37-lanchonete/internal/core/domain"
+	"g37-lanchonete/internal/core/ports"
+	"g37-lanchonete/internal/core/services/dto"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -22,14 +22,14 @@ func NewOrderService(customerService ports.CustomerService, paymentService ports
 	}
 }
 
-func (s orderService) GetAllOrders(pageParams dto.PageParams) (dto.Page[models.Order], error) {
+func (s orderService) GetAllOrders(pageParams dto.PageParams) (dto.Page[domain.Order], error) {
 	orders, err := s.orderRepository.FindAllOrders(pageParams)
 	if err != nil {
 		log.Errorf("failed to get all orders, error: %v", err)
-		return dto.Page[models.Order]{}, err
+		return dto.Page[domain.Order]{}, err
 	}
 
-	page := dto.BuildPage[models.Order](orders, pageParams)
+	page := dto.BuildPage[domain.Order](orders, pageParams)
 	return page, nil
 }
 
@@ -56,7 +56,7 @@ func (s orderService) CreateOrder(orderDTO dto.OrderDTO) (string, error) {
 	return paymentQRCode, nil
 }
 
-func (s orderService) saveOrder(order models.Order) error {
+func (s orderService) saveOrder(order domain.Order) error {
 	err := s.orderRepository.SaveOrder(order)
 	if err != nil {
 		return err

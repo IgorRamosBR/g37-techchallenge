@@ -2,8 +2,8 @@ package repositories
 
 import (
 	"encoding/json"
-	"g37-lanchonete/internal/domain/models"
-	"g37-lanchonete/internal/domain/ports"
+	"g37-lanchonete/internal/core/domain"
+	"g37-lanchonete/internal/core/ports"
 	"g37-lanchonete/internal/infra/clients"
 )
 
@@ -17,7 +17,7 @@ func NewPaymentOrderRepository(queue clients.Queue) ports.PaymentOrderRepository
 	}
 }
 
-func (r paymentOrderRepository) SavePaymentOrder(paymentOrder models.PaymentOrder) error {
+func (r paymentOrderRepository) SavePaymentOrder(paymentOrder domain.PaymentOrder) error {
 	payload, err := json.Marshal(paymentOrder)
 	if err != nil {
 		return err

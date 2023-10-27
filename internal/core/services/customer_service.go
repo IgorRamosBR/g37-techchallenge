@@ -1,9 +1,9 @@
 package services
 
 import (
-	"g37-lanchonete/internal/domain/models"
-	"g37-lanchonete/internal/domain/ports"
-	"g37-lanchonete/internal/domain/services/dto"
+	"g37-lanchonete/internal/core/domain"
+	"g37-lanchonete/internal/core/ports"
+	"g37-lanchonete/internal/core/services/dto"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -30,21 +30,21 @@ func (s customerService) CreateCustomer(customerDTO dto.CustomerDTO) error {
 	return nil
 }
 
-func (s customerService) GetCustomerById(id string) (models.Customer, error) {
+func (s customerService) GetCustomerById(id string) (domain.Customer, error) {
 	customer, err := s.customerRepository.FindCustomerById(id)
 	if err != nil {
 		log.Errorf("failed to get customer by id [%s], error: %v", id, err)
-		return models.Customer{}, err
+		return domain.Customer{}, err
 	}
 
 	return customer, nil
 }
 
-func (s customerService) GetCustomerByCPF(cpf string) (models.Customer, error) {
+func (s customerService) GetCustomerByCPF(cpf string) (domain.Customer, error) {
 	customer, err := s.customerRepository.FindCustomerByCPF(cpf)
 	if err != nil {
 		log.Errorf("failed to get customer by cpf [%s], error: %v", cpf, err)
-		return models.Customer{}, err
+		return domain.Customer{}, err
 	}
 
 	return customer, nil

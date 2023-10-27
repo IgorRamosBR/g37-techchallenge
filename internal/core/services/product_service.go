@@ -1,9 +1,9 @@
 package services
 
 import (
-	"g37-lanchonete/internal/domain/models"
-	"g37-lanchonete/internal/domain/ports"
-	"g37-lanchonete/internal/domain/services/dto"
+	"g37-lanchonete/internal/core/domain"
+	"g37-lanchonete/internal/core/ports"
+	"g37-lanchonete/internal/core/services/dto"
 	"strconv"
 
 	log "github.com/sirupsen/logrus"
@@ -19,25 +19,25 @@ func NewProductService(productRepository ports.ProductRepository) ports.ProductS
 	}
 }
 
-func (s productService) GetAllProducts(pageParameters dto.PageParams) (dto.Page[models.Product], error) {
+func (s productService) GetAllProducts(pageParameters dto.PageParams) (dto.Page[domain.Product], error) {
 	products, err := s.productRepository.FindAllProducts(pageParameters)
 	if err != nil {
 		log.Errorf("failed to get all products, error: %v", err)
-		return dto.Page[models.Product]{}, err
+		return dto.Page[domain.Product]{}, err
 	}
 
-	page := dto.BuildPage[models.Product](products, pageParameters)
+	page := dto.BuildPage[domain.Product](products, pageParameters)
 	return page, nil
 }
 
-func (s productService) GetProductsByCategory(pageParameters dto.PageParams, category string) (dto.Page[models.Product], error) {
+func (s productService) GetProductsByCategory(pageParameters dto.PageParams, category string) (dto.Page[domain.Product], error) {
 	products, err := s.productRepository.FindProductsByCategory(pageParameters, category)
 	if err != nil {
 		log.Errorf("failed to get products by category, error: %v", err)
-		return dto.Page[models.Product]{}, err
+		return dto.Page[domain.Product]{}, err
 	}
 
-	page := dto.BuildPage[models.Product](products, pageParameters)
+	page := dto.BuildPage[domain.Product](products, pageParameters)
 	return page, nil
 }
 
