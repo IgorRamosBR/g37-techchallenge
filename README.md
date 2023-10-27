@@ -27,9 +27,14 @@ Build image
   docker build -t g37-lanches:latest .
 ```
 
-Rodar aplicação
+Subir dependências
 ```bash
   docker-compose up -d
+```
+
+Rodar aplicação
+```bash
+  docker run -e ENVIRONMENT=dev --network="host" g37-lanches:latest
 ```
 ## Documentação
 Após rodar a aplicação
@@ -38,7 +43,7 @@ Após rodar a aplicação
 
 
 ## Arquitetura
-Estrutura de pastas baseada no [Standard Go Project Layout](https://github.com/golang-standards/project-layout#go-directories) 
+Arquitetura hexagonal com a estrutura de pastas baseada no [Standard Go Project Layout](https://github.com/golang-standards/project-layout#go-directories) 
 
 ```bash
 ├── cmd
