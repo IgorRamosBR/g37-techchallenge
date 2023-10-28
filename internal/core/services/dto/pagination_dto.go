@@ -34,7 +34,7 @@ type Page[T any] struct {
 }
 
 func BuildPage[T any](list []T, params PageParams) Page[T] {
-	if len(list) > 0 {
+	if len(list) > 0 && len(list) == params.limit {
 		next := params.GetOffset() + params.GetLimit()
 		return Page[T]{
 			Result: list,

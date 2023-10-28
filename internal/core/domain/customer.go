@@ -1,11 +1,13 @@
 package domain
 
-import "gorm.io/gorm"
+import "time"
 
 type Customer struct {
-	gorm.Model
-	Name   string `gorm:"size:100"`
-	Cpf    string `gorm:"size:11"`
-	Email  string `gorm:"size:100"`
-	Orders []Order
+	ID        uint      `gorm:"primaryKey"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	Name      string    `json:"name" gorm:"size:100"`
+	Cpf       string    `json:"cpf" gorm:"size:11"`
+	Email     string    `json:"email" gorm:"size:100"`
+	Orders    []Order   `json:"orders,omitempty"`
 }

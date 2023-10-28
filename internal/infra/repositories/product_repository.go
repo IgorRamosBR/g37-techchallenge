@@ -60,7 +60,7 @@ func (r productRepository) UpdateProduct(id uint, product domain.Product) error 
 	}
 
 	product.ID = id
-	err = r.client.Save(&product)
+	err = r.client.Update(&product)
 	if err != nil {
 		return fmt.Errorf("failed to update the product, error %v", err)
 	}

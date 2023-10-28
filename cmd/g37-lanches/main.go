@@ -51,8 +51,8 @@ func main() {
 
 		v1.GET("/products", productHandler.GetProducts)
 		v1.POST("/products", productHandler.CreateProducts)
-		v1.PUT("/products", productHandler.UpdateProduct)
-		v1.DELETE("/products", productHandler.DeleteProduct)
+		v1.PUT("/products/:id", productHandler.UpdateProduct)
+		v1.DELETE("/products/:id", productHandler.DeleteProduct)
 
 		v1.GET("/orders", orderHandler.GetAllOrders)
 		v1.POST("/orders", orderHandler.CreateOrder)

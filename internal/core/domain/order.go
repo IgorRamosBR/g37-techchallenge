@@ -1,9 +1,13 @@
 package domain
 
-import "gorm.io/gorm"
+import (
+	"time"
+)
 
 type Order struct {
-	gorm.Model
+	ID          uint      `gorm:"primaryKey"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
 	Items       []OrderItem
 	Coupon      string
 	Discount    float64
@@ -13,7 +17,9 @@ type Order struct {
 }
 
 type OrderItem struct {
-	gorm.Model
+	ID        uint      `gorm:"primaryKey"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 	ProductID uint
 	Product   Product `gorm:"foreignKey:ProductID;references:ID"`
 	Quantity  int

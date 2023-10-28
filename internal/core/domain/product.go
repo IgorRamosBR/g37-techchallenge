@@ -1,12 +1,14 @@
 package domain
 
-import "gorm.io/gorm"
+import "time"
 
 type Product struct {
-	gorm.Model
-	Name        string `gorm:"size:100"`
-	SkuId       string `gorm:"size:50"`
-	Description string `gorm:"size:2000"`
-	Category    string `gorm:"size:60"`
-	Price       float64
+	ID          uint      `gorm:"primaryKey"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+	Name        string    `json:"name" gorm:"size:100"`
+	SkuId       string    `json:"skuId" gorm:"size:50"`
+	Description string    `json:"description" gorm:"size:2000"`
+	Category    string    `json:"category" gorm:"size:60"`
+	Price       float64   `json:"price"`
 }

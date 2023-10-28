@@ -11,7 +11,7 @@ import (
 type CustomerDTO struct {
 	Name  string `json:"name" valid:"length(0|100)~Name length should be less than 100 characters"`
 	Email string `json:"email" valid:"email,length(5|100)~Email length should be between 5 and 100 characters"`
-	CPF   string `json:"cpf" valid:"cpf"`
+	CPF   string `json:"cpf"`
 }
 
 func (c CustomerDTO) ToCustomer() domain.Customer {

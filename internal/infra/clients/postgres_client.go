@@ -28,6 +28,11 @@ func (c postgresClient) Save(entity interface{}) error {
 	return result.Error
 }
 
+func (c postgresClient) Update(entity interface{}) error {
+	result := c.db.Save(entity)
+	return result.Error
+}
+
 func (c postgresClient) Delete(entity interface{}) error {
 	result := c.db.Delete(entity)
 	return result.Error

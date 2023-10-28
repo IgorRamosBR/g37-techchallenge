@@ -46,11 +46,13 @@ func (h CustomerHandler) GetCustomers(c *gin.Context) {
 	cpf := c.Query("cpf")
 	if cpf == "" {
 		handleBadRequestResponse(c, "cpf query parameter is required", errors.New("cpf is missing"))
+		return
 	}
 
 	customer, err := h.customerService.GetCustomerByCPF(cpf)
 	if err != nil {
-		c.JSON(404, err.Error())
+		handleNotFoundRequestResponse(c, "failed to find customer", err)
+		return
 	}
 
 	c.JSON(200, customer)
