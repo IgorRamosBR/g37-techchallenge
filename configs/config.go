@@ -90,9 +90,6 @@ func (c *Config) extractConfigVars() (AppConfig, error) {
 	appConfig.DatabaseUser = c.viper.GetString("postgres.user")
 	appConfig.DatabasePassword = c.viper.GetString("postgres.password")
 
-	appConfig.SQSRegion = c.viper.GetString("sqs.region")
-	appConfig.SQSEndpoint = c.viper.GetString("sqs.endpoint")
-
 	appConfig.PaymentBrokerURL = c.viper.GetString("paymentBroker.url")
 	appConfig.NotificationURL = c.viper.GetString("paymentBroker.notificationUrl")
 	appConfig.SponsorId = c.viper.GetString("paymentBroker.sponsorId")

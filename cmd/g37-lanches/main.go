@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"g37-lanchonete/configs"
 	"g37-lanchonete/internal/application"
@@ -10,8 +9,6 @@ import (
 	"g37-lanchonete/internal/infra/clients"
 	"g37-lanchonete/internal/infra/repositories"
 
-	awsconfig "github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -26,18 +23,16 @@ func main() {
 
 	httpClient := clients.NewHttpClient()
 	postgresSQLClient := createPostgresSQLClient(appConfig)
-	queue := createQueue(appConfig)
 	paymentBroker := clients.NewMercadoPagoBroker(httpClient, appConfig.PaymentBrokerURL)
 
 	customerRepository := repositories.NewCustomerRepository(postgresSQLClient)
 	productRepository := repositories.NewProductRepository(postgresSQLClient)
 	orderRepository := repositories.NewOrderRepository(postgresSQLClient)
-	paymentOrderRepository := repositories.NewPaymentOrderRepository(queue)
 
 	customerService := services.NewCustomerService(customerRepository)
 	productService := services.NewProductService(productRepository)
-	paymentService := services.NewPaymentService(appConfig.NotificationURL, appConfig.SponsorId, paymentBroker, paymentOrderRepository)
-	orderService := services.NewOrderService(customerService, paymentService, orderRepository)
+	paymentService := services.NewPaymentService(appConfig.NotificationURL, appConfig.SponsorId, paymentBroker)
+	orderService := services.NewOrderService(customerService, paymentService, productService, orderRepository)
 
 	customerHandler := application.NewCustomerHandler(customerService)
 	productHandler := application.NewProductHandler(productService)
@@ -77,13 +72,4 @@ func createPostgresSQLClient(appConfig configs.AppConfig) clients.SQLClient {
 	db.AutoMigrate(&domain.Customer{}, &domain.Order{}, &domain.OrderItem{}, &domain.Product{})
 
 	return clients.NewPostgresClient(db)
-}
-
-func createQueue(appConfig configs.AppConfig) clients.Queue {
-	cfg, err := awsconfig.LoadDefaultConfig(context.TODO(), awsconfig.WithRegion(appConfig.SQSRegion))
-	if err != nil {
-		panic(fmt.Sprintf("unable to load SDK config, %v", err))
-	}
-
-	return clients.NewSQSQueue(sqs.NewFromConfig(cfg), appConfig.SQSEndpoint)
 }

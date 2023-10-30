@@ -11,46 +11,28 @@ import (
 )
 
 type PaymentService interface {
-	ProcessPayment(order domain.Order) (string, error)
+	GeneratePaymentQRCode(order domain.Order) (string, error)
 }
 
 type paymentService struct {
-	notificationUrl        string
-	sponsorId              string
-	paymentBroker          ports.PaymentBroker
-	paymentOrderRepository ports.PaymentOrderRepository
+	notificationUrl string
+	sponsorId       string
+	paymentBroker   ports.PaymentBroker
 }
 
-func NewPaymentService(notificationUrl, sponsorId string, paymentBroker ports.PaymentBroker, paymentOrderRepository ports.PaymentOrderRepository) PaymentService {
+func NewPaymentService(notificationUrl, sponsorId string, paymentBroker ports.PaymentBroker) PaymentService {
 	return paymentService{
-		notificationUrl:        notificationUrl,
-		sponsorId:              sponsorId,
-		paymentBroker:          paymentBroker,
-		paymentOrderRepository: paymentOrderRepository,
+		notificationUrl: notificationUrl,
+		sponsorId:       sponsorId,
+		paymentBroker:   paymentBroker,
 	}
 }
 
-func (p paymentService) ProcessPayment(order domain.Order) (string, error) {
-	qrcode, err := p.generatePaymentQRCode(order)
-	if err != nil {
-		log.Errorf("failed to generate payment qrcode for the order [%d], error: %v", order.ID, err)
-		return "", err
-	}
-
-	paymentOrder := domain.PaymentOrder{Order: strconv.FormatUint(uint64(order.ID), 10)}
-	err = p.paymentOrderRepository.SavePaymentOrder(paymentOrder)
-	if err != nil {
-		log.Errorf("failed to save payment order for the order [%d], error: %v", order.ID, err)
-		return "", err
-	}
-
-	return qrcode, nil
-}
-
-func (p paymentService) generatePaymentQRCode(order domain.Order) (string, error) {
+func (p paymentService) GeneratePaymentQRCode(order domain.Order) (string, error) {
 	paymentRequest := p.createPaymentRequest(order)
 	paymentResponse, err := p.paymentBroker.GeneratePaymentQRCode(paymentRequest)
 	if err != nil {
+		log.Errorf("failed to generate payment qrcode for the order [%d], error: %v", order.ID, err)
 		return "", err
 	}
 
