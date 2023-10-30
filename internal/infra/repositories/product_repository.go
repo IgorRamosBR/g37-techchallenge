@@ -21,7 +21,7 @@ func NewProductRepository(client clients.SQLClient) ports.ProductRepository {
 
 func (r productRepository) FindAllProducts(pageParams dto.PageParams) ([]domain.Product, error) {
 	var products []domain.Product
-	err := r.client.FindAll(&products, pageParams.GetLimit(), pageParams.GetOffset(), "")
+	err := r.client.FindAll(&products, pageParams.GetLimit(), pageParams.GetOffset(), nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find all products, error %v", err)
 	}

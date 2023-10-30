@@ -40,9 +40,9 @@ func (p paymentService) GeneratePaymentQRCode(order domain.Order) (string, error
 }
 
 func (p paymentService) createPaymentRequest(order domain.Order) dto.PaymentQRCodeRequest {
-	items := make([]dto.PaymentItemRequest, len(order.Items))
-	for i, item := range order.Items {
-		items[i] = createPaymentItem(item)
+	var items []dto.PaymentItemRequest
+	for _, item := range order.Items {
+		items = append(items, createPaymentItem(item)...)
 	}
 
 	return dto.PaymentQRCodeRequest{
@@ -55,15 +55,28 @@ func (p paymentService) createPaymentRequest(order domain.Order) dto.PaymentQRCo
 	}
 }
 
-func createPaymentItem(item domain.OrderItem) dto.PaymentItemRequest {
-	return dto.PaymentItemRequest{
-		SkuNumber:   item.Product.SkuId,
-		Category:    item.Product.Category,
-		Title:       item.Product.Name,
-		Description: item.Product.Description,
-		UnitPrice:   item.Product.Price,
-		Quantity:    item.Quantity,
-		UnitMeasure: "unit",
-		TotalAmount: item.Product.Price * float64(item.Quantity),
+func createPaymentItem(item domain.OrderItem) []dto.PaymentItemRequest {
+	paymentItems := make([]dto.PaymentItemRequest, len(item.Products))
+	for i, product := range item.Products {
+		paymentItem := dto.PaymentItemRequest{
+			SkuNumber:   product.SkuId,
+			Category:    product.Category,
+			Title:       product.Name,
+			Description: product.Description,
+			UnitPrice:   product.Price,
+			Quantity:    item.Quantity,
+			UnitMeasure: getUnitMeasure(item.Type),
+			TotalAmount: product.Price * float64(item.Quantity),
+		}
+		paymentItems[i] = paymentItem
 	}
+
+	return paymentItems
+}
+
+func getUnitMeasure(itemType string) string {
+	if itemType == string(dto.OrderItemTypeCustomCombo) {
+		return "pack"
+	}
+	return "unit"
 }

@@ -10,12 +10,13 @@ var ErrNotFound = errors.New("entity not found")
 
 type SQLClient interface {
 	Save(entity any) error
+	SaveAssociations(entity any, field string, associations any) error
 	Update(entity any) error
 	Delete(entity any) error
 	Find(entity any, limit, offset int, query string, values ...any) error
 	FindFirst(entity any, query string, values ...any) error
 	FindById(id int, entity any) error
-	FindAll(entity any, limit, offset int, eagerFields string) error
+	FindAll(entity any, limit, offset int, eagerFields []string) error
 }
 
 type Pagination[T any] struct {

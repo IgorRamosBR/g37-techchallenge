@@ -28,6 +28,10 @@ func (c postgresClient) Save(entity interface{}) error {
 	return result.Error
 }
 
+func (c postgresClient) SaveAssociations(entity interface{}, field string, associations any) error {
+	return c.db.Model(entity).Association(field).Replace(associations)
+}
+
 func (c postgresClient) Update(entity interface{}) error {
 	result := c.db.Save(entity)
 	return result.Error
@@ -69,10 +73,10 @@ func (c postgresClient) FindById(id int, entity interface{}) error {
 	return nil
 }
 
-func (c postgresClient) FindAll(entity any, limit, offset int, eagerFields string) error {
+func (c postgresClient) FindAll(entity any, limit, offset int, eagerFields []string) error {
 	scope := c.db.Scopes(paginate(limit, offset, c.db))
-	if eagerFields != "" {
-		scope = scope.Preload(eagerFields)
+	for _, preload := range eagerFields {
+		scope = scope.Preload(preload)
 	}
 	result := scope.Find(entity)
 	if result.Error != nil {

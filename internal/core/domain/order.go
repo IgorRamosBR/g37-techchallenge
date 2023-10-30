@@ -16,12 +16,12 @@ type Order struct {
 }
 
 type OrderItem struct {
-	ID        uint      `gorm:"primaryKey"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-	ProductID int       `json:"-"`
-	Product   Product   `json:"product" gorm:"foreignKey:ProductID;references:ID"`
-	Quantity  int       `json:"quantity"`
-	Type      string    `json:"type"`
-	OrderID   int       `json:"-"`
+	ID         uint      `gorm:"primaryKey"`
+	CreatedAt  time.Time `json:"createdAt"`
+	UpdatedAt  time.Time `json:"updatedAt"`
+	ProductIds []int     `gorm:"-" json:"-"`
+	Products   []Product `json:"products" gorm:"many2many:orderitem_products;"`
+	Quantity   int       `json:"quantity"`
+	Type       string    `json:"type"`
+	OrderID    int       `json:"-"`
 }
