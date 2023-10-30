@@ -26,25 +26,24 @@ const (
 )
 
 type OrderItemDTO struct {
-	Product  ProductDTO
-	Quantity int           `json:"quantity" valid:"int,required~Quantity is required|range(1|)~Quantity greater than 0"`
-	Type     OrderItemType `json:"orderStatus" valid:"string,required~Type is required|in(UNIT|COMBO|CUSTOM_COMBO)~Type is invalid"`
+	ProductId int           `json:"productId" valid:"int,required~ProductId is required"`
+	Quantity  int           `json:"quantity" valid:"int,required~Quantity is required|range(1|)~Quantity greater than 0"`
+	Type      OrderItemType `json:"type" valid:"in(UNIT|COMBO|CUSTOM_COMBO),required~Type is invalid"`
 }
 
 func (o OrderItemDTO) toOrderItem() domain.OrderItem {
 	return domain.OrderItem{
-		Product:  o.Product.ToProduct(),
-		Quantity: o.Quantity,
-		Type:     string(o.Type),
+		ProductID: o.ProductId,
+		Quantity:  o.Quantity,
+		Type:      string(o.Type),
 	}
 }
 
 type OrderDTO struct {
-	Items       []OrderItemDTO
-	Coupon      string      `json:"coupon" valid:"length(0|100)~Description length should be less than 100 characters"`
-	Discount    float64     `json:"discount" valid:"float,required~Discount is required|range(0.0|)~Discount must be posivitve"`
-	CustomerId  string      `json:"customerId" valid:"length(0|200)~CustomerId length should be less than 200 characters"`
-	OrderStatus OrderStatus `json:"orderStatus" valid:"string,required~OrderStatus is required|in(CREATED|PAID|RECEIVED|IN_PROGRESS|READY|DONE)~OrderStatus is invalid"`
+	Items      []OrderItemDTO `json:"items"`
+	Coupon     string         `json:"coupon" valid:"length(0|100)~Description length should be less than 100 characters"`
+	CustomerId int            `json:"customerId" valid:"length(0|200)~CustomerId length should be less than 200 characters"`
+	Status     OrderStatus    `json:"status" valid:"in(CREATED|PAID|RECEIVED|IN_PROGRESS|READY|DONE),required~Status is invalid"`
 }
 
 func (o OrderDTO) ToOrder(customer domain.Customer) domain.Order {
@@ -56,9 +55,8 @@ func (o OrderDTO) ToOrder(customer domain.Customer) domain.Order {
 	return domain.Order{
 		Items:      orderItems,
 		Coupon:     o.Coupon,
-		Discount:   o.Discount,
 		CustomerID: customer.ID,
-		Status:     string(o.OrderStatus),
+		Status:     string(o.Status),
 	}
 }
 

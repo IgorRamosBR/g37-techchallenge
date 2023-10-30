@@ -3,7 +3,7 @@ package domain
 import "time"
 
 type Customer struct {
-	ID        uint      `gorm:"primaryKey"`
+	ID        int       `gorm:"primaryKey"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 	Name      string    `json:"name" gorm:"size:100"`

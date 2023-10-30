@@ -56,7 +56,7 @@ func (c postgresClient) FindFirst(entity any, query string, values ...any) error
 	return nil
 }
 
-func (c postgresClient) FindById(id string, entity interface{}) error {
+func (c postgresClient) FindById(id int, entity interface{}) error {
 	result := c.db.First(entity, id)
 	if result.RowsAffected == 0 {
 		return ErrNotFound
@@ -69,8 +69,12 @@ func (c postgresClient) FindById(id string, entity interface{}) error {
 	return nil
 }
 
-func (c postgresClient) FindAll(entity any, limit, offset int) error {
-	result := c.db.Scopes(paginate(limit, offset, c.db)).Find(entity)
+func (c postgresClient) FindAll(entity any, limit, offset int, eagerFields string) error {
+	scope := c.db.Scopes(paginate(limit, offset, c.db))
+	if eagerFields != "" {
+		scope = scope.Preload(eagerFields)
+	}
+	result := scope.Find(entity)
 	if result.Error != nil {
 		return result.Error
 	}

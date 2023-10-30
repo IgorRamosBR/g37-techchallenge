@@ -30,7 +30,7 @@ func (s customerService) CreateCustomer(customerDTO dto.CustomerDTO) error {
 	return nil
 }
 
-func (s customerService) GetCustomerById(id string) (domain.Customer, error) {
+func (s customerService) GetCustomerById(id int) (domain.Customer, error) {
 	customer, err := s.customerRepository.FindCustomerById(id)
 	if err != nil {
 		log.Errorf("failed to get customer by id [%s], error: %v", id, err)

@@ -25,8 +25,8 @@ type SponsorRequest struct {
 }
 
 type PaymentQRCodeResponse struct {
-	QrData       string `json:"qrData"`
-	StoreOrderId string `json:"storeOrderId"`
+	QrData       string `json:"qr_data"`
+	StoreOrderId string `json:"in_store_order_id"`
 }
 
 type PaymentQRCode struct {

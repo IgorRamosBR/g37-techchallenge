@@ -7,7 +7,6 @@ import (
 	"g37-lanchonete/internal/core/ports"
 	"g37-lanchonete/internal/core/services/dto"
 	"g37-lanchonete/internal/infra/clients"
-	"strconv"
 )
 
 type orderRepository struct {
@@ -22,7 +21,7 @@ func NewOrderRepository(client clients.SQLClient) ports.OrderRepository {
 
 func (r orderRepository) FindAllOrders(pageParams dto.PageParams) ([]domain.Order, error) {
 	var orders []domain.Order
-	err := r.client.FindAll(&orders, pageParams.GetLimit(), pageParams.GetOffset())
+	err := r.client.FindAll(&orders, pageParams.GetLimit(), pageParams.GetOffset(), "Items")
 	if err != nil {
 		return nil, fmt.Errorf("failed to find all orders, error %v", err)
 	}
@@ -41,7 +40,7 @@ func (r orderRepository) SaveOrder(order domain.Order) error {
 
 func (r orderRepository) UpdateOrder(id uint, order domain.Order) error {
 	var oldOrder domain.Order
-	err := r.client.FindById(strconv.FormatUint(uint64(id), 10), &oldOrder)
+	err := r.client.FindById(int(id), &oldOrder)
 	if err != nil {
 		if errors.Is(err, clients.ErrNotFound) {
 			return fmt.Errorf("order [%d] not found, error %v", id, err)

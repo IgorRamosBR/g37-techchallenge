@@ -17,12 +17,12 @@ func NewCustomerRepository(client clients.SQLClient) ports.CustomerRepository {
 	}
 }
 
-func (r customerRepository) FindCustomerById(id string) (domain.Customer, error) {
+func (r customerRepository) FindCustomerById(id int) (domain.Customer, error) {
 	var customer domain.Customer
 
-	err := r.client.FindById(id, customer)
+	err := r.client.FindById(id, &customer)
 	if err != nil {
-		return domain.Customer{}, fmt.Errorf("failed to find customer by id [%s], error %v", id, err)
+		return domain.Customer{}, fmt.Errorf("failed to find customer by id [%d], error %v", id, err)
 	}
 
 	return customer, nil

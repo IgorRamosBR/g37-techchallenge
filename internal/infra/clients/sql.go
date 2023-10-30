@@ -14,8 +14,8 @@ type SQLClient interface {
 	Delete(entity any) error
 	Find(entity any, limit, offset int, query string, values ...any) error
 	FindFirst(entity any, query string, values ...any) error
-	FindById(id string, entity any) error
-	FindAll(entity any, limit, offset int) error
+	FindById(id int, entity any) error
+	FindAll(entity any, limit, offset int, eagerFields string) error
 }
 
 type Pagination[T any] struct {

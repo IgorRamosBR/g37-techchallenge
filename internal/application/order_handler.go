@@ -28,7 +28,7 @@ func (h OrderHandler) CreateOrder(c *gin.Context) {
 
 	valid, err := order.ValidateOrder()
 	if !valid {
-		handleBadRequestResponse(c, "invalid product payload", err)
+		handleBadRequestResponse(c, "invalid order payload", err)
 		return
 	}
 

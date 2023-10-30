@@ -6,7 +6,7 @@ import (
 )
 
 type CustomerRepository interface {
-	FindCustomerById(id string) (domain.Customer, error)
+	FindCustomerById(id int) (domain.Customer, error)
 	FindCustomerByCPF(cpf string) (domain.Customer, error)
 	SaveCustomer(customer domain.Customer) error
 }
@@ -14,9 +14,10 @@ type CustomerRepository interface {
 type ProductRepository interface {
 	FindAllProducts(pageParams dto.PageParams) ([]domain.Product, error)
 	FindProductsByCategory(pageParams dto.PageParams, category string) ([]domain.Product, error)
+	FindProductById(id int) (domain.Product, error)
 	SaveProduct(product domain.Product) error
-	UpdateProduct(id uint, product domain.Product) error
-	DeleteProduct(id uint) error
+	UpdateProduct(id int, product domain.Product) error
+	DeleteProduct(id int) error
 }
 
 type OrderRepository interface {

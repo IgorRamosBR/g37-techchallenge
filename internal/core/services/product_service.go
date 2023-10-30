@@ -41,6 +41,16 @@ func (s productService) GetProductsByCategory(pageParameters dto.PageParams, cat
 	return page, nil
 }
 
+func (s productService) GetProductById(id int) (domain.Product, error) {
+	product, err := s.productRepository.FindProductById(id)
+	if err != nil {
+		log.Errorf("failed to get product by id, error: %v", err)
+		return domain.Product{}, err
+	}
+
+	return product, nil
+}
+
 func (s productService) CreateProduct(productDTO dto.ProductDTO) error {
 	product := productDTO.ToProduct()
 
@@ -54,14 +64,14 @@ func (s productService) CreateProduct(productDTO dto.ProductDTO) error {
 }
 
 func (s productService) UpdateProduct(idStr string, productDTO dto.ProductDTO) error {
-	id, err := strconv.ParseUint(idStr, 10, 32)
+	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		log.Errorf("failed to parse id [%s], error: %v", idStr, err)
 		return err
 	}
 
 	product := productDTO.ToProduct()
-	err = s.productRepository.UpdateProduct(uint(id), product)
+	err = s.productRepository.UpdateProduct(id, product)
 	if err != nil {
 		log.Errorf("failed to update product, error: %v", err)
 		return err
@@ -71,13 +81,13 @@ func (s productService) UpdateProduct(idStr string, productDTO dto.ProductDTO) e
 }
 
 func (s productService) DeleteProduct(idStr string) error {
-	id, err := strconv.ParseUint(idStr, 10, 32)
+	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		log.Errorf("failed to parse id [%s], error: %v", idStr, err)
 		return err
 	}
 
-	err = s.productRepository.DeleteProduct(uint(id))
+	err = s.productRepository.DeleteProduct(id)
 	if err != nil {
 		log.Errorf("failed to delete product, error: %v", err)
 		return err
