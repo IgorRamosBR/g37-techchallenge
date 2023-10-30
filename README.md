@@ -37,9 +37,7 @@ Rodar aplicação
   docker run -e ENVIRONMENT=dev --network="host" g37-lanches:latest
 ```
 ## Documentação
-Após rodar a aplicação
-
-[Documentation](https://linktodocumentation)
+[Documentation](https://github.com/IgorRamosBR/g37-techchallenge/tree/master/api)
 
 
 ## Arquitetura
