@@ -54,7 +54,7 @@ func (h ProductHandler) CreateProducts(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.Status(http.StatusOK)
 }
 
 func (h ProductHandler) UpdateProduct(c *gin.Context) {
@@ -83,7 +83,7 @@ func (h ProductHandler) UpdateProduct(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.Status(http.StatusOK)
 }
 
 func (h ProductHandler) DeleteProduct(c *gin.Context) {

@@ -29,59 +29,6 @@ tags:
 
 paths:
   /product:
-    put:
-      tags:
-        - product
-      summary: Atualizar um produto existente
-      description: Atualizar produto existente por ID
-      operationId: updateProduct
-      requestBody:
-        description: Atualizar um produto existente na loja
-        content:
-          application/json:
-            schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: "Batata frita"
-                  skuId:
-                    type: string
-                    example: "000001"
-                  description:
-                    type: string
-                    example: "Deliciosa batata frita"
-                  category:
-                    type: string
-                    example: "Acompanhamento"
-                  price:
-                    type: number
-                    format: double
-                    example: 16.00
-      responses:
-        '200':
-          description: 'OK'
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: "Batata frita"
-                  skuId:
-                    type: string
-                    example: "000001"
-                  description:
-                    type: string
-                    example: "Deliciosa batata frita"
-                  category:
-                    type: string
-                    example: "Acompanhamento"
-                  price:
-                    type: number
-                    format: double
-                    example: 16.00          
     post:
       tags:
         - product
@@ -129,6 +76,20 @@ paths:
           example: 'Combo'
           enum: [category]
         required: true
+      - in: query
+        name: limit
+        description: número de resultados por página
+        schema:
+          type: string
+          example: '50'
+        required: false
+      - in: query
+        name: offset
+        description: número no qual os resultados devem se iniciar
+        schema:
+          type: string
+          example: '40'
+        required: false
       responses:
         '200':
           description: 'OK'
@@ -166,19 +127,84 @@ paths:
                         price:
                           type: number
                           example: 40
+                  next:
+                    type: number
+                    example: 1
          
 
-  /product/{ID}:
+  /product/{id}:
+    put:
+      tags:
+        - product
+      summary: Atualizar um produto existente
+      description: Atualizar produto existente por ID
+      operationId: updateProduct
+      parameters:
+        - name: id
+          in: path
+          description: ID do produto que será deletado 
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 4
+      requestBody:
+        description: Atualizar um produto existente na loja
+        content:
+          application/json:
+            schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "Batata frita"
+                  skuId:
+                    type: string
+                    example: "000001"
+                  description:
+                    type: string
+                    example: "Deliciosa batata frita"
+                  category:
+                    type: string
+                    example: "Acompanhamento"
+                  price:
+                    type: number
+                    format: double
+                    example: 16.00
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "Batata frita"
+                  skuId:
+                    type: string
+                    example: "000001"
+                  description:
+                    type: string
+                    example: "Deliciosa batata frita"
+                  category:
+                    type: string
+                    example: "Acompanhamento"
+                  price:
+                    type: number
+                    format: double
+                    example: 16.00          
     delete:
       tags:
         - product
-      summary: Deletar Categoria
-      description: Delete uma Categoria
-      operationId: DeleteProduct
+      summary: Deletar produto
+      description: Delete um produto
+      operationId: DeleteProduct por ID
       parameters:
-        - name: ID
+        - name: id
           in: path
-          description: Categoria Deletada
+          description: Product ID a ser Deletado
           required: true
           schema:
             type: integer
@@ -191,12 +217,12 @@ paths:
   
   
   
-  /orders/:
+  /orders:
     post:
       tags:
         - orders
-      summary: Criar uma ordem (combo)
-      description: Criar orderns customizadas
+      summary: Criar um pedido
+      description: Criar pedidos com itens unitários, combos prontos ou combos personalizados. Sendo que os itens unitários e os combos prontos, a lista de productIds deverá conter apenas um único ID.
       operationId: createOrdersCustom
       requestBody:
         content:
@@ -221,7 +247,9 @@ paths:
                         type: string
                         enum:
                           - UNIT
-                        example: "UNIT"
+                          - COMBO
+                          - CUSTOM_COMBO
+                        example: "CUSTOM_COMBO"
                 customerId:
                   type: integer
                   example: 1
@@ -236,62 +264,114 @@ paths:
       responses:
         '200':
           description: 'OK'
-  
-  /orders:
-    post:
-      tags:
-        - orders
-      summary: Criar ordem
-      description: Criar ordem unitária
-      operationId: createOrderUnity
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                items:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      productIds:
-                        type: array
-                        items:
-                          type: integer
-                        example: [2]
-                      quantity:
-                        type: integer
-                        example: 2
-                      type:
-                        type: string
-                        enum:
-                          - UNIT
-                        example: "UNIT"
-                customerId:
-                  type: integer
-                  example: 1
-                coupon:
-                  type: string
-                  example: "APP10"
-                status:
-                  type: string
-                  enum:
-                    - CREATED
-                  example: "CREATED"
-      responses:
-        '200':
-          description: 'OK'
-  
     get:
       tags:
         - orders
       summary: Buscar ordens cadastradas
       description: Buscar todas as ordens cadastradas.
       operationId: getAllOrders
+      parameters:
+      - in: query
+        name: limit
+        description: número de resultados por página
+        schema:
+          type: string
+          example: '50'
+        required: false
+      - in: query
+        name: offset
+        description: número no qual os resultados devem se iniciar
+        schema:
+          type: string
+          example: '30'
+        required: false
       responses:
         '200':
           description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ID:
+                          type: number
+                          example: 1
+                        createdAt:
+                          type: string
+                          example: "2023-10-29T19:39:21.338373-03:00"
+                        updatedAt:
+                          type: string
+                          example: "2023-10-29T19:39:21.338373-03:00"
+                        items:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              ID:
+                                type: number
+                                example: 123
+                              createdAt:
+                                type: string
+                                example: "2023-10-29T19:39:21.338373-03:00"
+                              updatedAt:
+                                type: string
+                                example: "2023-10-29T19:39:21.338373-03:00"
+                              products:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    ID:
+                                      type: number
+                                      example: 2
+                                    createdAt:
+                                      type: string
+                                      example: "2023-10-29T19:39:21.338373-03:00"
+                                    updatedAt:
+                                      type: string
+                                      example: "2023-10-29T19:39:21.338373-03:00"
+                                    name:
+                                      type: string
+                                      example: "Nuggets"
+                                    skuId:
+                                      type: string
+                                      example: "000002"
+                                    description:
+                                      type: string
+                                      example: "Frango empanado"
+                                    category:
+                                      type: string
+                                      example: "Acompanhamento"
+                                    price:
+                                      type: number
+                                      example: 10.9
+                              quantity:
+                                type: integer
+                                example: 2
+                              type:
+                                type: string
+                                enum:
+                                  - UNIT
+                                  - COMBO
+                                  - CUSTOM_COMBO
+                                example: "UNIT"
+                        coupon:
+                          type: string
+                          example: "APP10"
+                        status:
+                          type: string
+                          enum:
+                            - CREATED
+                          example: "CREATED"
+                  next:
+                    type: number
+                    example: 1
+          
   
   
   

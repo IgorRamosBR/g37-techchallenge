@@ -39,7 +39,7 @@ func (h CustomerHandler) SaveCustomer(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.Status(http.StatusOK)
 }
 
 func (h CustomerHandler) GetCustomers(c *gin.Context) {

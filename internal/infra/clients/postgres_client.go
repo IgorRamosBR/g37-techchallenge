@@ -2,6 +2,7 @@ package clients
 
 import (
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type postgresClient struct {
@@ -76,7 +77,7 @@ func (c postgresClient) FindById(id int, entity interface{}) error {
 func (c postgresClient) FindAll(entity any, limit, offset int, eagerFields []string) error {
 	scope := c.db.Scopes(paginate(limit, offset, c.db))
 	for _, preload := range eagerFields {
-		scope = scope.Preload(preload)
+		scope = scope.Preload(preload).Preload(clause.Associations)
 	}
 	result := scope.Find(entity)
 	if result.Error != nil {

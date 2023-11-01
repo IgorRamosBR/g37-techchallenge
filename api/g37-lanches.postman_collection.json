@@ -101,7 +101,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/v1/products?category=Acompanhamento",
+							"raw": "localhost:8080/v1/products?category=Acompanhamento&limit=2&offset=1",
 							"host": [
 								"localhost"
 							],
@@ -114,6 +114,14 @@
 								{
 									"key": "category",
 									"value": "Acompanhamento"
+								},
+								{
+									"key": "limit",
+									"value": "2"
+								},
+								{
+									"key": "offset",
+									"value": "1"
 								}
 							]
 						}
@@ -135,7 +143,7 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/v1/products/1",
+							"raw": "localhost:8080/v1/products/:id",
 							"host": [
 								"localhost"
 							],
@@ -143,7 +151,13 @@
 							"path": [
 								"v1",
 								"products",
-								"1"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
 							]
 						}
 					},
@@ -155,7 +169,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/v1/products/1",
+							"raw": "localhost:8080/v1/products/:id",
 							"host": [
 								"localhost"
 							],
@@ -163,7 +177,13 @@
 							"path": [
 								"v1",
 								"products",
-								"1"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
 							]
 						}
 					},
@@ -236,7 +256,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/v1/orders",
+							"raw": "localhost:8080/v1/orders?limit=2&offset=1",
 							"host": [
 								"localhost"
 							],
@@ -244,6 +264,16 @@
 							"path": [
 								"v1",
 								"orders"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "2"
+								},
+								{
+									"key": "offset",
+									"value": "1"
+								}
 							]
 						}
 					},
