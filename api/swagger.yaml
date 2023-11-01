@@ -411,7 +411,6 @@ paths:
         schema:
           type: string
           example: '83397074690'
-          enum: [cpf]
         required: true
       responses:
         '200':
