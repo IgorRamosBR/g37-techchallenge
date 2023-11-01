@@ -34,7 +34,7 @@ Subir dependências
 
 Rodar aplicação
 ```bash
-  docker run -e ENVIRONMENT=dev --network="host" g37-lanches:latest
+  docker run -e ENVIRONMENT=dev -p 8080:8080 --network="host" g37-lanches:latest
 ```
 ## Documentação
 [Documentation](https://github.com/IgorRamosBR/g37-techchallenge/tree/master/api)
