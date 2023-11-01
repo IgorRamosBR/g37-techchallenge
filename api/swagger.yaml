@@ -1,0 +1,363 @@
+openapi: 3.0.3
+info:
+  title: API de Realização de Pedidos e Pagamento de Lanches - g37-lanches
+  description: |- 
+    A API de Realização de Pedidos e Pagamento de Lanches, denominada "g37-lanches," oferece uma solução eficiente para a realização de pedidos e pagamento em uma lanchonete. Os clientes podem navegar pelo menu, escolher produtos individualmente, criar combos personalizados e efetuar o pagamento de forma simples e conveniente.
+
+    **Funcionalidades Principais:**
+
+    1. **Realização do Pedido e Pagamento:**
+       - Os clientes começam o processo de pedido utilizando o sistema de autoatendimento, onde podem selecionar produtos individualmente ou montar seus próprios combos.
+       - O sistema fornece informações detalhadas sobre os produtos, incluindo nome, imagem, descrição e preço.
+       - Os clientes têm a opção de adicionar produtos à sacola e, em seguida, prosseguir para o pagamento.
+       - O processo de pagamento inclui um resumo do pedido, a possibilidade de inserir cupons promocionais e fornecer informações de identificação para receber promoções.
+       - O pagamento é realizado por meio do aplicativo do Mercado Pago, com a leitura do QR Code.
+    
+    links úteis:
+    - [Repositório do Projeto ](https://github.com/IgorRamosBR/g37-techchallenge)
+    - [Documentação DDD](https://docs.google.com/document/d/1cOhK9ychHcw6xCaa9AuH9t98FAmcPHPYo1ob395zgKE/edit#heading=h.69nvor85beny)
+  version: 1.0.11
+servers:
+  - url: http://localhost:8080/v1/
+tags:
+  - name: customers
+    description: Operações sobre os clientes
+  - name: product
+    description: Operações sobre os produtos
+  - name: orders
+    description: Operações sobre as ordens
+
+paths:
+  /product:
+    put:
+      tags:
+        - product
+      summary: Atualizar um produto existente
+      description: Atualizar produto existente por ID
+      operationId: updateProduct
+      requestBody:
+        description: Atualizar um produto existente na loja
+        content:
+          application/json:
+            schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "Batata frita"
+                  skuId:
+                    type: string
+                    example: "000001"
+                  description:
+                    type: string
+                    example: "Deliciosa batata frita"
+                  category:
+                    type: string
+                    example: "Acompanhamento"
+                  price:
+                    type: number
+                    format: double
+                    example: 16.00
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "Batata frita"
+                  skuId:
+                    type: string
+                    example: "000001"
+                  description:
+                    type: string
+                    example: "Deliciosa batata frita"
+                  category:
+                    type: string
+                    example: "Acompanhamento"
+                  price:
+                    type: number
+                    format: double
+                    example: 16.00          
+    post:
+      tags:
+        - product
+      summary: Adicione um novo produto à loja
+      description: Adicione um novo produto à loja
+      operationId: createProduct
+      requestBody:
+        description: Crie um novo produto na loja
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Combo 4"
+                skuId:
+                  type: string
+                  example: "000006"
+                description:
+                  type: string
+                  example: "Lanche, acompanhamento e bebida sortida"
+                category:
+                  type: string
+                  example: "Combo"
+                price:
+                  type: number
+                  format: double
+                  example: 40.00
+      responses:
+        '200':
+          description: 'OK'
+          
+    get:
+      tags:
+        - product
+      summary: Busca por categoria
+      description: Procurar um produto por categoria
+      operationId: GetProductsByCategory
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+          example: 'Combo'
+          enum: [category]
+        required: true
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ID:
+                          type: integer
+                          example: 4
+                        createdAt:
+                          type: string
+                          format: date-time
+                        updatedAt:
+                          type: string
+                          format: date-time
+                        name:
+                          type: string
+                          example: 'Combo 4'
+                        skuId:
+                          type: string
+                          example: '000006'
+                        description:
+                          type: string
+                          example: 'Lanche, acompanhament e bebida sortida'
+                        category:
+                          type: string
+                          example: 'Combo'
+                        price:
+                          type: number
+                          example: 40
+         
+
+  /product/{ID}:
+    delete:
+      tags:
+        - product
+      summary: Deletar Categoria
+      description: Delete uma Categoria
+      operationId: DeleteProduct
+      parameters:
+        - name: ID
+          in: path
+          description: Categoria Deletada
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 4
+      responses:
+        '200':
+          description: 'OK'
+  
+  
+  
+  
+  /orders/:
+    post:
+      tags:
+        - orders
+      summary: Criar uma ordem (combo)
+      description: Criar orderns customizadas
+      operationId: createOrdersCustom
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      productIds:
+                        type: array
+                        items:
+                          type: integer
+                        example: [2, 3]
+                      quantity:
+                        type: integer
+                        example: 2
+                      type:
+                        type: string
+                        enum:
+                          - UNIT
+                        example: "UNIT"
+                customerId:
+                  type: integer
+                  example: 1
+                coupon:
+                  type: string
+                  example: "APP10"
+                status:
+                  type: string
+                  enum:
+                    - CREATED
+                  example: "CREATED"
+      responses:
+        '200':
+          description: 'OK'
+  
+  /orders:
+    post:
+      tags:
+        - orders
+      summary: Criar ordem
+      description: Criar ordem unitária
+      operationId: createOrderUnity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      productIds:
+                        type: array
+                        items:
+                          type: integer
+                        example: [2]
+                      quantity:
+                        type: integer
+                        example: 2
+                      type:
+                        type: string
+                        enum:
+                          - UNIT
+                        example: "UNIT"
+                customerId:
+                  type: integer
+                  example: 1
+                coupon:
+                  type: string
+                  example: "APP10"
+                status:
+                  type: string
+                  enum:
+                    - CREATED
+                  example: "CREATED"
+      responses:
+        '200':
+          description: 'OK'
+  
+    get:
+      tags:
+        - orders
+      summary: Buscar ordens cadastradas
+      description: Buscar todas as ordens cadastradas.
+      operationId: getAllOrders
+      responses:
+        '200':
+          description: 'OK'
+  
+  
+  
+  /customers:
+    post:
+      tags:
+        - customers
+      summary: Cadastrar cliente
+      operationId: createCustomer
+      requestBody:
+        description: Objeto do cliente criado
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Bruno
+                cpf:
+                  type: string
+                  example: '83397074690'
+                email:
+                  type: string
+                  example: bruno.carneiro@glive.com
+      responses:
+        '200':
+          description: 'OK'
+      
+    get:
+      tags:
+        - customers
+      summary: Buscar clientes através do CPF
+      parameters:
+      - in: query
+        name: cpf
+        schema:
+          type: string
+          example: '83397074690'
+          enum: [cpf]
+        required: true
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    example: 1
+                  createdAt:
+                    type: string
+                    example: '2023-10-31T10:41:38.816861Z'
+                  updatedAt:
+                    type: string
+                    example: '2023-10-31T10:41:38.816861Z'
+                  name:
+                    type: string
+                    example: 'Bruno'
+                  cpf:
+                    type: string
+                    example: '83397074690'
+                  email:
+                    type: string
+                    example: 'bruno.carneiro@live.com'
+    
