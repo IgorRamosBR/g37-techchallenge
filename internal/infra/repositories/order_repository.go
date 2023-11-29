@@ -29,20 +29,30 @@ func (r orderRepository) FindAllOrders(pageParams dto.PageParams) ([]domain.Orde
 	return orders, nil
 }
 
-func (r orderRepository) SaveOrder(order domain.Order) error {
+func (r orderRepository) GetOrderStatus(orderId int) (string, error) {
+	var order domain.Order
+	err := r.client.FindById(orderId, &order)
+	if err != nil {
+		return "", fmt.Errorf("failed to find all orders, error %v", err)
+	}
+
+	return order.Status, nil
+}
+
+func (r orderRepository) SaveOrder(order domain.Order) (uint, error) {
 	err := r.client.Save(&order)
 	if err != nil {
-		return fmt.Errorf("failed to save order, error %v", err)
+		return 0, fmt.Errorf("failed to save order, error %v", err)
 	}
 
 	for _, item := range order.Items {
 		err := r.client.SaveAssociations(&item, "Products", item.Products)
 		if err != nil {
-			return fmt.Errorf("failed to save order items associations, error %v", err)
+			return 0, fmt.Errorf("failed to save order items associations, error %v", err)
 		}
 	}
 
-	return nil
+	return order.ID, nil
 }
 
 func (r orderRepository) UpdateOrder(id uint, order domain.Order) error {
