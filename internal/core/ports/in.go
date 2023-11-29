@@ -22,7 +22,8 @@ type ProductService interface {
 
 type OrderService interface {
 	GetAllOrders(pageParameters dto.PageParams) (dto.Page[domain.Order], error)
-	CreateOrder(orderDTO dto.OrderDTO) (string, error)
+	GetOrderStatus(orderId int) (string, error)
+	CreateOrder(orderDTO dto.OrderDTO) (dto.OrderCreationResponse, error)
 }
 
 type PaymentService interface {

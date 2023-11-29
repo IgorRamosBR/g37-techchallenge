@@ -35,35 +35,48 @@ func (s orderService) GetAllOrders(pageParams dto.PageParams) (dto.Page[domain.O
 	return page, nil
 }
 
-func (s orderService) CreateOrder(orderDTO dto.OrderDTO) (string, error) {
+func (s orderService) CreateOrder(orderDTO dto.OrderDTO) (dto.OrderCreationResponse, error) {
+	// Obter o cliente pelo ID
 	customer, err := s.customerService.GetCustomerById(orderDTO.CustomerId)
 	if err != nil {
 		log.Errorf("failed to get customer [%d], error: %v", orderDTO.CustomerId, err)
-		return "", err
+		return dto.OrderCreationResponse{}, err
 	}
 
+	// Criar um pedido a partir do DTO
 	order := orderDTO.ToOrder(customer)
 
-	totalAmout, err := s.calculateProducts(order.Items)
+	// Calcular o total dos produtos
+	totalAmount, err := s.calculateProducts(order.Items)
 	if err != nil {
 		log.Errorf("failed to calculate products, error: %v", err)
-		return "", err
+		return dto.OrderCreationResponse{}, err
 	}
 
-	order.TotalAmount = totalAmout
-	err = s.saveOrder(order)
+	// Definir o total no pedido
+	order.TotalAmount = totalAmount
+
+	// Salvar o pedido no banco de dados
+	order.ID, err = s.saveOrder(order)
 	if err != nil {
 		log.Errorf("failed to save order, error: %v", err)
-		return "", err
+		return dto.OrderCreationResponse{}, err
 	}
 
+	// Gerar o código QR para o pagamento
 	paymentQRCode, err := s.paymentService.GeneratePaymentQRCode(order)
 	if err != nil {
 		log.Errorf("failed to process payment order, error: %v", err)
-		return "", err
+		return dto.OrderCreationResponse{}, err
 	}
 
-	return paymentQRCode, nil
+	// Construir a resposta com o código QR e o ID do pedido
+	response := dto.OrderCreationResponse{
+		QRCode:  paymentQRCode,
+		OrderID: order.ID,
+	}
+
+	return response, nil
 }
 
 func (s orderService) calculateProducts(items []domain.OrderItem) (float64, error) {
@@ -106,11 +119,20 @@ func (s orderService) calculateTotal(items []domain.OrderItem) float64 {
 	return total
 }
 
-func (s orderService) saveOrder(order domain.Order) error {
-	err := s.orderRepository.SaveOrder(order)
+func (s orderService) saveOrder(order domain.Order) (uint, error) {
+	orderId, err := s.orderRepository.SaveOrder(order)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	return orderId, nil
+}
+
+func (s orderService) GetOrderStatus(orderId int) (string, error) {
+	status, err := s.orderRepository.GetOrderStatus(orderId)
+	if err != nil {
+		return "", err
+	}
+
+	return status, nil
 }

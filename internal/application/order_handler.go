@@ -1,9 +1,11 @@
 package application
 
 import (
+	"errors"
 	"g37-lanchonete/internal/core/ports"
 	"g37-lanchonete/internal/core/services/dto"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,13 +34,13 @@ func (h OrderHandler) CreateOrder(c *gin.Context) {
 		return
 	}
 
-	paymentQRCode, err := h.orderService.CreateOrder(order)
+	createResponse, err := h.orderService.CreateOrder(order)
 	if err != nil {
 		handleInternalServerResponse(c, "failed to create product", err)
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.PaymentQRCode{QRCode: paymentQRCode})
+	c.JSON(http.StatusOK, dto.OrderCreationResponse{QRCode: createResponse.QRCode, OrderID: createResponse.OrderID})
 }
 
 func (h OrderHandler) GetAllOrders(c *gin.Context) {
@@ -54,4 +56,27 @@ func (h OrderHandler) GetAllOrders(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, page)
+}
+
+func (h OrderHandler) GetOrderStatus(c *gin.Context) {
+	orderId := c.Param("id")
+	if orderId == "" {
+		handleBadRequestResponse(c, "id query parameter is required", errors.New("id is missing"))
+		return
+	}
+
+	orderIDInt, err := strconv.Atoi(orderId)
+	if err != nil {
+		handleInternalServerResponse(c, "id inválido", err)
+		return
+	}
+
+	response, err := h.orderService.GetOrderStatus(orderIDInt)
+	if err != nil {
+		handleInternalServerResponse(c, "failed to get all orders", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
+
 }

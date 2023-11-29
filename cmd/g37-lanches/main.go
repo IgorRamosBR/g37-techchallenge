@@ -50,6 +50,7 @@ func main() {
 		v1.DELETE("/products/:id", productHandler.DeleteProduct)
 
 		v1.GET("/orders", orderHandler.GetAllOrders)
+		v1.GET("/orders/status/:id", orderHandler.GetOrderStatus)
 		v1.POST("/orders", orderHandler.CreateOrder)
 	}
 
