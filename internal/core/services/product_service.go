@@ -5,6 +5,7 @@ import (
 	"g37-lanchonete/internal/core/ports"
 	"g37-lanchonete/internal/core/services/dto"
 	"strconv"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -53,6 +54,8 @@ func (s productService) GetProductById(id int) (domain.Product, error) {
 
 func (s productService) CreateProduct(productDTO dto.ProductDTO) error {
 	product := productDTO.ToProduct()
+	product.CreatedAt = time.Now()
+	product.UpdatedAt = time.Now()
 
 	err := s.productRepository.SaveProduct(product)
 	if err != nil {
@@ -71,6 +74,7 @@ func (s productService) UpdateProduct(idStr string, productDTO dto.ProductDTO) e
 	}
 
 	product := productDTO.ToProduct()
+	product.UpdatedAt = time.Now()
 	err = s.productRepository.UpdateProduct(id, product)
 	if err != nil {
 		log.Errorf("failed to update product, error: %v", err)

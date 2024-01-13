@@ -4,23 +4,27 @@ import (
 	"fmt"
 	"g37-lanchonete/internal/core/domain"
 	"g37-lanchonete/internal/core/ports"
-	"g37-lanchonete/internal/infra/clients"
+	"g37-lanchonete/internal/infra/clients/sql"
+	"g37-lanchonete/internal/infra/sqlscripts"
 )
 
 type customerRepository struct {
-	client clients.SQLClient
+	sqlClient sql.SQLClient
 }
 
-func NewCustomerRepository(client clients.SQLClient) ports.CustomerRepository {
+func NewCustomerRepository(sqlClient sql.SQLClient) ports.CustomerRepository {
 	return customerRepository{
-		client: client,
+		sqlClient: sqlClient,
 	}
 }
 
 func (r customerRepository) FindCustomerById(id int) (domain.Customer, error) {
-	var customer domain.Customer
+	getCustomerByIdQuery := fmt.Sprintf(sqlscripts.GetCustomerByIdQuery)
 
-	err := r.client.FindById(id, &customer)
+	row := r.sqlClient.FindOne(getCustomerByIdQuery, id)
+
+	var customer domain.Customer
+	err := row.Scan(&customer.ID, &customer.Name, &customer.Cpf, &customer.Email, &customer.CreatedAt, &customer.UpdatedAt)
 	if err != nil {
 		return domain.Customer{}, fmt.Errorf("failed to find customer by id [%d], error %v", id, err)
 	}
@@ -29,9 +33,12 @@ func (r customerRepository) FindCustomerById(id int) (domain.Customer, error) {
 }
 
 func (r customerRepository) FindCustomerByCPF(cpf string) (domain.Customer, error) {
-	customer := domain.Customer{Cpf: cpf}
+	getCustomerByIdQuery := fmt.Sprintf(sqlscripts.GetCustomerByIdQuery)
 
-	err := r.client.FindFirst(&customer, "cpf = ?", cpf)
+	row := r.sqlClient.FindOne(getCustomerByIdQuery, cpf)
+
+	var customer domain.Customer
+	err := row.Scan(&customer.ID, &customer.Name, &customer.Cpf, &customer.Email, &customer.CreatedAt, &customer.UpdatedAt)
 	if err != nil {
 		return domain.Customer{}, fmt.Errorf("failed to find customer by cpf [%s], error %v", cpf, err)
 	}
@@ -40,7 +47,9 @@ func (r customerRepository) FindCustomerByCPF(cpf string) (domain.Customer, erro
 }
 
 func (r customerRepository) SaveCustomer(customer domain.Customer) error {
-	err := r.client.Save(&customer)
+	insertCustomerCmd := fmt.Sprintf(sqlscripts.InsertCustomer)
+
+	_, err := r.sqlClient.Exec(insertCustomerCmd, customer.Name, customer.Cpf, customer.Email, customer.CreatedAt, customer.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("failed to save customer, error %v", err)
 	}

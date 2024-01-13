@@ -4,6 +4,7 @@ import (
 	"g37-lanchonete/internal/core/domain"
 	"g37-lanchonete/internal/core/ports"
 	"g37-lanchonete/internal/core/services/dto"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -20,6 +21,8 @@ func NewCustomerService(customerRepository ports.CustomerRepository) ports.Custo
 
 func (s customerService) CreateCustomer(customerDTO dto.CustomerDTO) error {
 	customer := customerDTO.ToCustomer()
+	customer.CreatedAt = time.Now()
+	customer.UpdatedAt = time.Now()
 
 	err := s.customerRepository.SaveCustomer(customer)
 	if err != nil {
@@ -33,7 +36,7 @@ func (s customerService) CreateCustomer(customerDTO dto.CustomerDTO) error {
 func (s customerService) GetCustomerById(id int) (domain.Customer, error) {
 	customer, err := s.customerRepository.FindCustomerById(id)
 	if err != nil {
-		log.Errorf("failed to get customer by id [%s], error: %v", id, err)
+		log.Errorf("failed to get customer by id [%d], error: %v", id, err)
 		return domain.Customer{}, err
 	}
 

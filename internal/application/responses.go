@@ -27,6 +27,14 @@ func handleBadRequestResponse(c *gin.Context, message string, err error) {
 	c.JSON(http.StatusBadRequest, badRequestError)
 }
 
+func handleNotFoundResponse(c *gin.Context, message string, err error) {
+	notFoundError := ErrorResponse{
+		Message: message,
+		Err:     err.Error(),
+	}
+	c.JSON(http.StatusNotFound, notFoundError)
+}
+
 func handleInternalServerResponse(c *gin.Context, message string, err error) {
 	internalServerError := ErrorResponse{
 		Message: message,

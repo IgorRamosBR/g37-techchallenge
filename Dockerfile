@@ -20,5 +20,7 @@ RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -
 COPY --from=builder /app/bin/main /app/main
 COPY --from=builder /app/configs /configs
 
+EXPOSE 8080
+
 # Run the web service on container startup.
 CMD ["/app/main"]
