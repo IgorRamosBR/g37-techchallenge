@@ -81,12 +81,12 @@ func (s orderService) CreateOrder(orderDTO dto.OrderDTO) (dto.OrderCreationRespo
 
 func (s orderService) calculateProducts(items []domain.OrderItem) (float64, error) {
 	for i, item := range items {
-		products, err := s.getProducts(item.ProductIds)
+		product, err := s.getProduct(item.Product.ID)
 		if err != nil {
 			log.Errorf("failed to find products to process order, error: %v", err)
 			return 0.0, err
 		}
-		item.Products = products
+		item.Product = product
 		items[i] = item
 	}
 
@@ -94,32 +94,25 @@ func (s orderService) calculateProducts(items []domain.OrderItem) (float64, erro
 	return totalAmount, nil
 }
 
-func (s orderService) getProducts(productIds []int) ([]domain.Product, error) {
-	products := make([]domain.Product, len(productIds))
-	for i, id := range productIds {
-		product, err := s.productService.GetProductById(id)
-		if err != nil {
-			log.Errorf("failed to find product [%d] to process order, error: %v", id, err)
-			return nil, err
-		}
-		products[i] = product
+func (s orderService) getProduct(id int) (domain.Product, error) {
+	product, err := s.productService.GetProductById(id)
+	if err != nil {
+		log.Errorf("failed to find product [%d] to process order, error: %v", id, err)
+		return domain.Product{}, err
 	}
 
-	return products, nil
+	return product, nil
 }
 
 func (s orderService) calculateTotal(items []domain.OrderItem) float64 {
 	var total float64
 	for _, item := range items {
-		for _, product := range item.Products {
-			total += product.Price * float64(item.Quantity)
-		}
+		total += item.Product.Price * float64(item.Quantity)
 	}
-
 	return total
 }
 
-func (s orderService) saveOrder(order domain.Order) (uint, error) {
+func (s orderService) saveOrder(order domain.Order) (int, error) {
 	orderId, err := s.orderRepository.SaveOrder(order)
 	if err != nil {
 		return 0, err

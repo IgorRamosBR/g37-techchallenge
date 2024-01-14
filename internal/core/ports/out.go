@@ -22,9 +22,8 @@ type ProductRepository interface {
 
 type OrderRepository interface {
 	FindAllOrders(pageParams dto.PageParams) ([]domain.Order, error)
-	SaveOrder(order domain.Order) (uint, error)
+	SaveOrder(order domain.Order) (int, error)
 	GetOrderStatus(orderId int) (string, error)
-	UpdateOrder(id uint, order domain.Order) error
 }
 
 type PaymentBroker interface {

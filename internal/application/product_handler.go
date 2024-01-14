@@ -4,7 +4,7 @@ import (
 	"errors"
 	"g37-lanchonete/internal/core/ports"
 	"g37-lanchonete/internal/core/services/dto"
-	"g37-lanchonete/internal/infra/clients"
+	"g37-lanchonete/internal/infra/clients/sql"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -80,7 +80,7 @@ func (h ProductHandler) UpdateProduct(c *gin.Context) {
 
 	err = h.productService.UpdateProduct(id, product)
 	if err != nil {
-		if errors.Is(err, clients.ErrNotFound) {
+		if errors.Is(err, sql.ErrNotFound) {
 			handleNotFoundResponse(c, "product not found", err)
 			return
 		}
@@ -100,7 +100,7 @@ func (h ProductHandler) DeleteProduct(c *gin.Context) {
 
 	err := h.productService.DeleteProduct(id)
 	if err != nil {
-		if errors.Is(err, clients.ErrNotFound) {
+		if errors.Is(err, sql.ErrNotFound) {
 			handleNotFoundResponse(c, "product not found", err)
 			return
 		}

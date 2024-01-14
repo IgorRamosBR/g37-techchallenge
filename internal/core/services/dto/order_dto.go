@@ -1,8 +1,8 @@
 package dto
 
 import (
-	"fmt"
 	"g37-lanchonete/internal/core/domain"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 )
@@ -27,16 +27,18 @@ const (
 )
 
 type OrderItemDTO struct {
-	ProductIds []int         `json:"productIds"`
-	Quantity   int           `json:"quantity" valid:"int,required~Quantity is required|range(1|)~Quantity greater than 0"`
-	Type       OrderItemType `json:"type" valid:"in(UNIT|COMBO|CUSTOM_COMBO),required~Type is invalid"`
+	ProductId int           `json:"productIds"`
+	Quantity  int           `json:"quantity" valid:"int,required~Quantity is required|range(1|)~Quantity greater than 0"`
+	Type      OrderItemType `json:"type" valid:"in(UNIT|COMBO|CUSTOM_COMBO),required~Type is invalid"`
 }
 
 func (o OrderItemDTO) toOrderItem() domain.OrderItem {
 	return domain.OrderItem{
-		ProductIds: o.ProductIds,
-		Quantity:   o.Quantity,
-		Type:       string(o.Type),
+		Product: domain.Product{
+			ID: o.ProductId,
+		},
+		Quantity: o.Quantity,
+		Type:     string(o.Type),
 	}
 }
 
@@ -54,22 +56,18 @@ func (o OrderDTO) ToOrder(customer domain.Customer) domain.Order {
 	}
 
 	return domain.Order{
-		Items:      orderItems,
-		Coupon:     o.Coupon,
-		CustomerID: customer.ID,
-		Status:     string(o.Status),
+		Items:     orderItems,
+		Coupon:    o.Coupon,
+		Customer:  customer,
+		Status:    string(o.Status),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 }
 
 func (o OrderDTO) ValidateOrder() (bool, error) {
 	if _, err := govalidator.ValidateStruct(o); err != nil {
 		return false, err
-	}
-
-	for _, item := range o.Items {
-		if item.Type != OrderItemTypeCustomCombo && len(item.ProductIds) > 1 {
-			return false, fmt.Errorf("item type [%s] must have only one productId", item.Type)
-		}
 	}
 
 	return true, nil

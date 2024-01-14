@@ -6,6 +6,7 @@ type TransactionWrapper interface {
 	Find(query string, args ...any) (RowsWrapper, error)
 	FindOne(query string, args ...any) RowWrapper
 	Exec(query string, args ...any) (sql.Result, error)
+	ExecWithReturn(query string, args ...any) RowWrapper
 	Commit() error
 	Rollback() error
 }
@@ -33,6 +34,11 @@ func (t transactionWrapper) FindOne(query string, args ...any) RowWrapper {
 func (t transactionWrapper) Exec(query string, args ...any) (sql.Result, error) {
 	result, err := t.tx.Exec(query, args...)
 	return result, err
+}
+
+func (t transactionWrapper) ExecWithReturn(query string, args ...any) RowWrapper {
+	row := t.tx.QueryRow(query, args...)
+	return NewRowWrapper(row)
 }
 
 func (t transactionWrapper) Commit() error {

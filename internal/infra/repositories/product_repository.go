@@ -5,7 +5,6 @@ import (
 	"g37-lanchonete/internal/core/domain"
 	"g37-lanchonete/internal/core/ports"
 	"g37-lanchonete/internal/core/services/dto"
-	"g37-lanchonete/internal/infra/clients"
 	"g37-lanchonete/internal/infra/clients/sql"
 	"g37-lanchonete/internal/infra/sqlscripts"
 )
@@ -107,7 +106,7 @@ func (r productRepository) UpdateProduct(id int, product domain.Product) error {
 	}
 
 	if rowsAffected < 1 {
-		return clients.ErrNotFound
+		return sql.ErrNotFound
 	}
 
 	return nil
@@ -127,7 +126,7 @@ func (r productRepository) DeleteProduct(id int) error {
 	}
 
 	if rowsAffected < 1 {
-		return clients.ErrNotFound
+		return sql.ErrNotFound
 	}
 	return nil
 }
