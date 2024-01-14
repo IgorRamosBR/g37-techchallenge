@@ -18,6 +18,18 @@ const (
 	OrderStatusDone       OrderStatus = "DONE"
 )
 
+type OrderStatusRequest struct {
+	Status OrderStatus `json:"status" valid:"in(CREATED|PAID|RECEIVED,IN_PROGRESS,READY,DONE),required~Status is invalid"`
+}
+
+func (o OrderStatusRequest) Validate() (bool, error) {
+	if _, err := govalidator.ValidateStruct(o); err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 type OrderItemType string
 
 const (

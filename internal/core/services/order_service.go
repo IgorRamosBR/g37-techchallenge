@@ -129,3 +129,12 @@ func (s orderService) GetOrderStatus(orderId int) (string, error) {
 
 	return status, nil
 }
+
+func (s orderService) UpdateOrderStatus(orderId int, orderStatus string) error {
+	err := s.orderRepository.UpdateOrderStatus(orderId, orderStatus)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

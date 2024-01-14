@@ -78,3 +78,21 @@ func (r orderRepository) SaveOrder(order domain.Order) (int, error) {
 
 	return orderId, nil
 }
+
+func (r orderRepository) UpdateOrderStatus(orderId int, orderStatus string) error {
+	result, err := r.sqlClient.Exec(sqlscripts.UpdateOrderStatusCmd, orderId, orderStatus)
+	if err != nil {
+		return fmt.Errorf("failed to update order status, error %w", err)
+	}
+
+	rowsAffect, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check order status update operation, error %w", err)
+	}
+
+	if rowsAffect < 1 {
+		return sql.ErrNotFound
+	}
+
+	return nil
+}

@@ -35,3 +35,9 @@ const InsertOrderItemCmd = `
 	INSERT INTO public.order_items(order_id, product_id, quantity, type)
 	VALUES ($1, $2, $3, $4)
 `
+
+const UpdateOrderStatusCmd = `
+	UPDATE public.orders
+	SET status = $2
+	WHERE id = $1
+`

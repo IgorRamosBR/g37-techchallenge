@@ -23,6 +23,7 @@ type ProductService interface {
 type OrderService interface {
 	GetAllOrders(pageParameters dto.PageParams) (dto.Page[domain.Order], error)
 	GetOrderStatus(orderId int) (string, error)
+	UpdateOrderStatus(orderId int, orderStatus string) error
 	CreateOrder(orderDTO dto.OrderDTO) (dto.OrderCreationResponse, error)
 }
 
