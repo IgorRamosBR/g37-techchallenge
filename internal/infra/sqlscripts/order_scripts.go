@@ -15,7 +15,8 @@ const FindAllOrdersQuery = `
 		c.updated_at	
 	FROM public.orders o
 	LEFT JOIN public.customers c ON o.customer_id = c.id
-	ORDER BY o.created_at DESC
+	ORDER BY ORDER BY array_position(array['READY','IN_PROGRESS','RECEIVED'], o.status), o.created_at ASC
+	WHERE status <> DONE
 	LIMIT $1 OFFSET $2
 `
 
