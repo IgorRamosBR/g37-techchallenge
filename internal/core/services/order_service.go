@@ -121,13 +121,15 @@ func (s orderService) saveOrder(order domain.Order) (int, error) {
 	return orderId, nil
 }
 
-func (s orderService) GetOrderStatus(orderId int) (string, error) {
+func (s orderService) GetOrderStatus(orderId int) (dto.OrderStatusDTO, error) {
 	status, err := s.orderRepository.GetOrderStatus(orderId)
 	if err != nil {
-		return "", err
+		return dto.OrderStatusDTO{}, err
 	}
 
-	return status, nil
+	return dto.OrderStatusDTO{
+		Status: dto.OrderStatus(status),
+	}, nil
 }
 
 func (s orderService) UpdateOrderStatus(orderId int, orderStatus string) error {

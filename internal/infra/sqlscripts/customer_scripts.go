@@ -7,7 +7,7 @@ const GetCustomerByIdQuery = `
 		c.cpf, 
 		c.email,
 		c.created_at,
-		c.updated_at,
+		c.updated_at
 	FROM public.customers as c
 	WHERE c.id = $1
 `
@@ -19,7 +19,7 @@ const GetCustomerByCPFQuery = `
 		c.cpf, 
 		c.email,
 		c.created_at,
-		c.updated_at,
+		c.updated_at
 	FROM public.customers as c
 	WHERE c.cpf = $1
 `

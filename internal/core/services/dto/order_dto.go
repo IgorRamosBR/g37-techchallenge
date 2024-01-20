@@ -18,11 +18,11 @@ const (
 	OrderStatusDone       OrderStatus = "DONE"
 )
 
-type OrderStatusRequest struct {
-	Status OrderStatus `json:"status" valid:"in(CREATED|PAID|RECEIVED,IN_PROGRESS,READY,DONE),required~Status is invalid"`
+type OrderStatusDTO struct {
+	Status OrderStatus `json:"status" valid:"in(CREATED|PAID|RECEIVED|IN_PROGRESS|READY|DONE),required~Status is invalid"`
 }
 
-func (o OrderStatusRequest) Validate() (bool, error) {
+func (o OrderStatusDTO) Validate() (bool, error) {
 	if _, err := govalidator.ValidateStruct(o); err != nil {
 		return false, err
 	}
@@ -39,7 +39,7 @@ const (
 )
 
 type OrderItemDTO struct {
-	ProductId int           `json:"productIds"`
+	ProductId int           `json:"productId"`
 	Quantity  int           `json:"quantity" valid:"int,required~Quantity is required|range(1|)~Quantity greater than 0"`
 	Type      OrderItemType `json:"type" valid:"in(UNIT|COMBO|CUSTOM_COMBO),required~Type is invalid"`
 }
@@ -73,7 +73,6 @@ func (o OrderDTO) ToOrder(customer domain.Customer) domain.Order {
 		Customer:  customer,
 		Status:    string(o.Status),
 		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
 	}
 }
 

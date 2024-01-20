@@ -33,7 +33,7 @@ func (r customerRepository) FindCustomerById(id int) (domain.Customer, error) {
 }
 
 func (r customerRepository) FindCustomerByCPF(cpf string) (domain.Customer, error) {
-	getCustomerByIdQuery := fmt.Sprintf(sqlscripts.GetCustomerByIdQuery)
+	getCustomerByIdQuery := fmt.Sprintf(sqlscripts.GetCustomerByCPFQuery)
 
 	row := r.sqlClient.FindOne(getCustomerByIdQuery, cpf)
 

@@ -94,7 +94,7 @@ func (h OrderHandler) UpdateOrderStatus(c *gin.Context) {
 		return
 	}
 
-	var orderStatus dto.OrderStatusRequest
+	var orderStatus dto.OrderStatusDTO
 	err = c.ShouldBindJSON(&orderStatus)
 	if err != nil {
 		handleBadRequestResponse(c, "failed to bind order status payload", err)

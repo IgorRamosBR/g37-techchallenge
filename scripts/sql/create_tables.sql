@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS public.products (
 	"sku_id" text,
 	"description" text,
 	"category" text,
-	"price" numeric "created_at" timestamptz not null,
+	"price" numeric,
+	"created_at" timestamptz not null,
 	"updated_at" timestamptz not null
 );
 

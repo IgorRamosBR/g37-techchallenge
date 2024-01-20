@@ -26,7 +26,7 @@ const GetProductsByCategoryQuery = `
 		p.created_at,
 		p.updated_at
 	FROM public.products as p
-	WHERE p.category = '%s'
+	WHERE p.category = $1
 	ORDER BY p.name ASC
 	LIMIT %d OFFSET %d
 `
@@ -42,7 +42,7 @@ const GetProductByIdQuery = `
 		p.created_at,
 		p.updated_at
 	FROM public.products as p
-	WHERE p.id = %d
+	WHERE p.id = $1
 `
 
 const InsertProductCmd = `
@@ -52,7 +52,7 @@ const InsertProductCmd = `
 
 const UpdateProductCmd = `
 	UPDATE public.products
-	SET name = $2, sku_id = $3, description = $4, category = $5, price = $6, created_at = $7, updated_at = $8
+	SET name = $2, sku_id = $3, description = $4, category = $5, price = $6, updated_at = $7
 	WHERE id = $1
 `
 

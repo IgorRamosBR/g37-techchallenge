@@ -43,9 +43,9 @@ func (r productRepository) FindAllProducts(pageParams dto.PageParams) ([]domain.
 }
 
 func (r productRepository) FindProductsByCategory(pageParams dto.PageParams, category string) ([]domain.Product, error) {
-	getProductsByCategoryQuery := fmt.Sprintf(sqlscripts.GetProductsByCategoryQuery, category, pageParams.GetLimit(), pageParams.GetOffset())
+	getProductsByCategoryQuery := fmt.Sprintf(sqlscripts.GetProductsByCategoryQuery, pageParams.GetLimit(), pageParams.GetOffset())
 
-	rows, err := r.sqlClient.Find(getProductsByCategoryQuery)
+	rows, err := r.sqlClient.Find(getProductsByCategoryQuery, category)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find products by category, error %w", err)
 	}
@@ -66,9 +66,7 @@ func (r productRepository) FindProductsByCategory(pageParams dto.PageParams, cat
 }
 
 func (r productRepository) FindProductById(id int) (domain.Product, error) {
-	getProductByIdQuery := fmt.Sprintf(sqlscripts.GetProductByIdQuery, id)
-
-	row := r.sqlClient.FindOne(getProductByIdQuery)
+	row := r.sqlClient.FindOne(sqlscripts.GetProductByIdQuery, id)
 
 	var product domain.Product
 	err := row.Scan(&product.ID, &product.Name, &product.SkuId, &product.Description, &product.Category, &product.Price, &product.CreatedAt, &product.UpdatedAt)
@@ -95,7 +93,7 @@ func (r productRepository) UpdateProduct(id int, product domain.Product) error {
 	updateProductCmd := fmt.Sprintf(sqlscripts.UpdateProductCmd)
 
 	result, err := r.sqlClient.Exec(updateProductCmd, id, product.Name, product.SkuId, product.Description, product.Category,
-		product.Price, product.CreatedAt, product.UpdatedAt)
+		product.Price, product.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("failed to update the product [%d], error %w", id, err)
 	}

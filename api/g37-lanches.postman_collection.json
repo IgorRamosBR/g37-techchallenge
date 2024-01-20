@@ -74,7 +74,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Combo 1\",\n    \"skuId\": \"000005\",\n    \"description\": \"Lanche, acompanhament e bebida sortida\",\n    \"category\": \"Combo\",\n    \"price\": 40.00\n}",
+							"raw": "{\n    \"name\": \"Combo 1\",\n    \"skuId\": \"000005\",\n    \"description\": \"Lanche, acompanhament e bebida sortida\",\n    \"category\": \"Acompanhamento\",\n    \"price\": 40.00\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -90,6 +90,39 @@
 							"path": [
 								"v1",
 								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/v1/products?category=Acompanhamento&limit=2&offset=1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"products"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "Acompanhamento"
+								},
+								{
+									"key": "limit",
+									"value": "2"
+								},
+								{
+									"key": "offset",
+									"value": "1"
+								}
 							]
 						}
 					},
@@ -229,7 +262,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"items\": [\n        {\n            \"productIds\": [2],\n            \"quantity\": 2,\n            \"type\": \"UNIT\"\n        }\n    ],\n    \"customerId\": 1,\n    \"coupon\": \"APP10\",\n    \"status\": \"CREATED\"\n}",
+							"raw": "{\n    \"items\": [\n        {\n            \"productId\": 3,\n            \"quantity\": 1,\n            \"type\": \"UNIT\"\n        },\n        {\n            \"productId\": 4,\n            \"quantity\": 1,\n            \"type\": \"UNIT\"\n        }\n    ],\n    \"customerId\": 1,\n    \"coupon\": \"APP10\",\n    \"status\": \"CREATED\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -273,6 +306,72 @@
 								{
 									"key": "offset",
 									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get order status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/v1/orders/2/status",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"orders",
+								"2",
+								"status"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update order status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/v1/orders/2/status",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"orders",
+								"2",
+								"status"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "1",
+									"disabled": true
 								}
 							]
 						}

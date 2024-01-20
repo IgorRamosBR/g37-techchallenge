@@ -25,7 +25,7 @@ func (r orderRepository) FindAllOrders(pageParams dto.PageParams) ([]domain.Orde
 		return nil, fmt.Errorf("failed to find all orders, error %w", err)
 	}
 
-	var orders []domain.Order
+	orders := []domain.Order{}
 	for rows.Next() {
 		var order domain.Order
 		var customer domain.Customer
@@ -36,7 +36,13 @@ func (r orderRepository) FindAllOrders(pageParams dto.PageParams) ([]domain.Orde
 			return nil, fmt.Errorf("failed to scan orders, error %w", err)
 		}
 
+		orderItems, err := r.getOrderItems(order.ID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan order items, error %w", err)
+		}
+
 		order.Customer = customer
+		order.Items = orderItems
 		orders = append(orders, order)
 	}
 
@@ -61,7 +67,7 @@ func (r orderRepository) SaveOrder(order domain.Order) (int, error) {
 		return -1, fmt.Errorf("failed to create a transaction, error %w", err)
 	}
 
-	row := tx.ExecWithReturn(sqlscripts.InsertOrderCmd, order.Coupon, order.TotalAmount, order.Customer.ID, order.Status, order.CreatedAt, order.UpdatedAt)
+	row := tx.ExecWithReturn(sqlscripts.InsertOrderCmd, order.Coupon, order.TotalAmount, order.Customer.ID, order.Status, order.CreatedAt)
 
 	var orderId int
 	err = row.Scan(&orderId)
@@ -74,6 +80,11 @@ func (r orderRepository) SaveOrder(order domain.Order) (int, error) {
 		if err != nil {
 			return -1, fmt.Errorf("failed to save order items associations, error %v", err)
 		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return -1, fmt.Errorf("failed to commit the transaction, error %w", err)
 	}
 
 	return orderId, nil
@@ -95,4 +106,28 @@ func (r orderRepository) UpdateOrderStatus(orderId int, orderStatus string) erro
 	}
 
 	return nil
+}
+
+func (r orderRepository) getOrderItems(orderId int) ([]domain.OrderItem, error) {
+	rows, err := r.sqlClient.Find(sqlscripts.FindOrderItems, orderId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find order items, error %w", err)
+	}
+
+	orderItems := []domain.OrderItem{}
+	for rows.Next() {
+		var orderItem domain.OrderItem
+		var product domain.Product
+
+		err = rows.Scan(&orderItem.ID, &product.ID, &product.Name, &product.SkuId, &product.Description,
+			&product.Category, &product.Price, &product.CreatedAt, &product.UpdatedAt, &orderItem.Quantity, &orderItem.Type)
+		if err != nil {
+			return nil, err
+		}
+
+		orderItem.Product = product
+		orderItems = append(orderItems, orderItem)
+	}
+
+	return orderItems, nil
 }
