@@ -1,4 +1,4 @@
-package application
+package controllers
 
 import (
 	"g37-lanchonete/internal/core/services/dto"
