@@ -4,7 +4,7 @@ import (
 	"errors"
 	"g37-lanchonete/internal/core/ports"
 	"g37-lanchonete/internal/core/services/dto"
-	"g37-lanchonete/internal/infra/clients/sql"
+	"g37-lanchonete/internal/infra/drivers/sql"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

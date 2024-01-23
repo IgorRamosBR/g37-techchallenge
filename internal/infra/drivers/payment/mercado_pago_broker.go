@@ -1,18 +1,22 @@
-package clients
+package payment
 
 import (
 	"encoding/json"
 	"fmt"
-	"g37-lanchonete/internal/core/ports"
 	"g37-lanchonete/internal/core/services/dto"
+	"g37-lanchonete/internal/infra/drivers/http"
 )
 
+type PaymentBroker interface {
+	GeneratePaymentQRCode(dto.PaymentQRCodeRequest) (dto.PaymentQRCodeResponse, error)
+}
+
 type mercadoPagoBroker struct {
-	httpClient HttpClient
+	httpClient http.HttpClient
 	brokerPath string
 }
 
-func NewMercadoPagoBroker(httpClient HttpClient, brokerPath string) ports.PaymentBroker {
+func NewMercadoPagoBroker(httpClient http.HttpClient, brokerPath string) PaymentBroker {
 	return mercadoPagoBroker{
 		httpClient: httpClient,
 		brokerPath: brokerPath,

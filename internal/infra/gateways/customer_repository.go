@@ -3,8 +3,8 @@ package gateways
 import (
 	"fmt"
 	"g37-lanchonete/internal/core/domain"
-	"g37-lanchonete/internal/infra/clients/sql"
-	"g37-lanchonete/internal/infra/sqlscripts"
+	"g37-lanchonete/internal/infra/drivers/sql"
+	"g37-lanchonete/internal/infra/gateways/sqlscripts"
 )
 
 type CustomerRepositoryGateway interface {

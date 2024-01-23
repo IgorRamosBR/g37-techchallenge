@@ -3,8 +3,8 @@ package services
 import (
 	"fmt"
 	"g37-lanchonete/internal/core/domain"
-	"g37-lanchonete/internal/core/ports"
 	"g37-lanchonete/internal/core/services/dto"
+	"g37-lanchonete/internal/infra/drivers/payment"
 	"strconv"
 
 	log "github.com/sirupsen/logrus"
@@ -17,10 +17,10 @@ type PaymentService interface {
 type paymentService struct {
 	notificationUrl string
 	sponsorId       string
-	paymentBroker   ports.PaymentBroker
+	paymentBroker   payment.PaymentBroker
 }
 
-func NewPaymentService(notificationUrl, sponsorId string, paymentBroker ports.PaymentBroker) PaymentService {
+func NewPaymentService(notificationUrl, sponsorId string, paymentBroker payment.PaymentBroker) PaymentService {
 	return paymentService{
 		notificationUrl: notificationUrl,
 		sponsorId:       sponsorId,

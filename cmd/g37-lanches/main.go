@@ -4,8 +4,9 @@ import (
 	"g37-lanchonete/configs"
 	"g37-lanchonete/internal/application"
 	"g37-lanchonete/internal/core/services"
-	"g37-lanchonete/internal/infra/clients"
-	"g37-lanchonete/internal/infra/clients/sql"
+	httpDriver "g37-lanchonete/internal/infra/drivers/http"
+	paymentDriver "g37-lanchonete/internal/infra/drivers/payment"
+	sqlDriver "g37-lanchonete/internal/infra/drivers/sql"
 	"g37-lanchonete/internal/infra/gateways"
 
 	"github.com/gin-gonic/gin"
@@ -18,10 +19,10 @@ func main() {
 		panic(err)
 	}
 
-	httpClient := clients.NewHttpClient()
+	httpClient := httpDriver.NewHttpClient()
 	postgresSQLClient := createPostgresSQLClient(appConfig)
 
-	paymentBroker := clients.NewMercadoPagoBroker(httpClient, appConfig.PaymentBrokerURL)
+	paymentBroker := paymentDriver.NewMercadoPagoBroker(httpClient, appConfig.PaymentBrokerURL)
 
 	customerRepositoryGateway := gateways.NewCustomerRepositoryGateway(postgresSQLClient)
 	productRepositoryGateway := gateways.NewProductRepositoryGateway(postgresSQLClient)
@@ -57,8 +58,8 @@ func main() {
 	router.Run(":8080")
 }
 
-func createPostgresSQLClient(appConfig configs.AppConfig) sql.SQLClient {
-	db, err := sql.NewPostgresSQLClient(appConfig.DatabaseUser, appConfig.DatabasePassword, appConfig.DatabaseHost, appConfig.DatabasePort, appConfig.DatabaseName)
+func createPostgresSQLClient(appConfig configs.AppConfig) sqlDriver.SQLClient {
+	db, err := sqlDriver.NewPostgresSQLClient(appConfig.DatabaseUser, appConfig.DatabasePassword, appConfig.DatabaseHost, appConfig.DatabasePort, appConfig.DatabaseName)
 	if err != nil {
 		panic("failed to connect database")
 	}
