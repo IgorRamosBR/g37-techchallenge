@@ -4,28 +4,29 @@ import (
 	"g37-lanchonete/internal/core/domain"
 	"g37-lanchonete/internal/core/ports"
 	"g37-lanchonete/internal/core/services/dto"
+	"g37-lanchonete/internal/infra/gateways"
 
 	log "github.com/sirupsen/logrus"
 )
 
 type orderService struct {
-	customerService ports.CustomerService
-	paymentService  ports.PaymentService
-	productService  ports.ProductService
-	orderRepository ports.OrderRepository
+	customerService        ports.CustomerService
+	paymentService         ports.PaymentService
+	productService         ports.ProductService
+	orderRepositoryGateway gateways.OrderRepositoryGateway
 }
 
-func NewOrderService(customerService ports.CustomerService, paymentService ports.PaymentService, productService ports.ProductService, orderRepository ports.OrderRepository) ports.OrderService {
+func NewOrderService(customerService ports.CustomerService, paymentService ports.PaymentService, productService ports.ProductService, orderRepositoryGateway gateways.OrderRepositoryGateway) ports.OrderService {
 	return orderService{
-		customerService: customerService,
-		paymentService:  paymentService,
-		productService:  productService,
-		orderRepository: orderRepository,
+		customerService:        customerService,
+		paymentService:         paymentService,
+		productService:         productService,
+		orderRepositoryGateway: orderRepositoryGateway,
 	}
 }
 
 func (s orderService) GetAllOrders(pageParams dto.PageParams) (dto.Page[domain.Order], error) {
-	orders, err := s.orderRepository.FindAllOrders(pageParams)
+	orders, err := s.orderRepositoryGateway.FindAllOrders(pageParams)
 	if err != nil {
 		log.Errorf("failed to get all orders, error: %v", err)
 		return dto.Page[domain.Order]{}, err
@@ -113,7 +114,7 @@ func (s orderService) calculateTotal(items []domain.OrderItem) float64 {
 }
 
 func (s orderService) saveOrder(order domain.Order) (int, error) {
-	orderId, err := s.orderRepository.SaveOrder(order)
+	orderId, err := s.orderRepositoryGateway.SaveOrder(order)
 	if err != nil {
 		return 0, err
 	}
@@ -122,7 +123,7 @@ func (s orderService) saveOrder(order domain.Order) (int, error) {
 }
 
 func (s orderService) GetOrderStatus(orderId int) (dto.OrderStatusDTO, error) {
-	status, err := s.orderRepository.GetOrderStatus(orderId)
+	status, err := s.orderRepositoryGateway.GetOrderStatus(orderId)
 	if err != nil {
 		return dto.OrderStatusDTO{}, err
 	}
@@ -133,7 +134,7 @@ func (s orderService) GetOrderStatus(orderId int) (dto.OrderStatusDTO, error) {
 }
 
 func (s orderService) UpdateOrderStatus(orderId int, orderStatus string) error {
-	err := s.orderRepository.UpdateOrderStatus(orderId, orderStatus)
+	err := s.orderRepositoryGateway.UpdateOrderStatus(orderId, orderStatus)
 	if err != nil {
 		return err
 	}

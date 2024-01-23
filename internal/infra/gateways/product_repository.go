@@ -1,25 +1,33 @@
-package repositories
+package gateways
 
 import (
 	"fmt"
 	"g37-lanchonete/internal/core/domain"
-	"g37-lanchonete/internal/core/ports"
 	"g37-lanchonete/internal/core/services/dto"
 	"g37-lanchonete/internal/infra/clients/sql"
 	"g37-lanchonete/internal/infra/sqlscripts"
 )
 
-type productRepository struct {
+type ProductRepositoryGateway interface {
+	FindAllProducts(pageParams dto.PageParams) ([]domain.Product, error)
+	FindProductsByCategory(pageParams dto.PageParams, category string) ([]domain.Product, error)
+	FindProductById(id int) (domain.Product, error)
+	SaveProduct(product domain.Product) error
+	UpdateProduct(id int, product domain.Product) error
+	DeleteProduct(id int) error
+}
+
+type productRepositoryGateway struct {
 	sqlClient sql.SQLClient
 }
 
-func NewProductRepository(sqlClient sql.SQLClient) ports.ProductRepository {
-	return productRepository{
+func NewProductRepositoryGateway(sqlClient sql.SQLClient) ProductRepositoryGateway {
+	return productRepositoryGateway{
 		sqlClient: sqlClient,
 	}
 }
 
-func (r productRepository) FindAllProducts(pageParams dto.PageParams) ([]domain.Product, error) {
+func (r productRepositoryGateway) FindAllProducts(pageParams dto.PageParams) ([]domain.Product, error) {
 	getAllProductsQuery := fmt.Sprintf(sqlscripts.GetAllProductsQuery, pageParams.GetLimit(), pageParams.GetOffset())
 
 	rows, err := r.sqlClient.Find(getAllProductsQuery)
@@ -42,7 +50,7 @@ func (r productRepository) FindAllProducts(pageParams dto.PageParams) ([]domain.
 	return products, nil
 }
 
-func (r productRepository) FindProductsByCategory(pageParams dto.PageParams, category string) ([]domain.Product, error) {
+func (r productRepositoryGateway) FindProductsByCategory(pageParams dto.PageParams, category string) ([]domain.Product, error) {
 	getProductsByCategoryQuery := fmt.Sprintf(sqlscripts.GetProductsByCategoryQuery, pageParams.GetLimit(), pageParams.GetOffset())
 
 	rows, err := r.sqlClient.Find(getProductsByCategoryQuery, category)
@@ -65,7 +73,7 @@ func (r productRepository) FindProductsByCategory(pageParams dto.PageParams, cat
 	return products, nil
 }
 
-func (r productRepository) FindProductById(id int) (domain.Product, error) {
+func (r productRepositoryGateway) FindProductById(id int) (domain.Product, error) {
 	row := r.sqlClient.FindOne(sqlscripts.GetProductByIdQuery, id)
 
 	var product domain.Product
@@ -77,7 +85,7 @@ func (r productRepository) FindProductById(id int) (domain.Product, error) {
 	return product, nil
 }
 
-func (r productRepository) SaveProduct(product domain.Product) error {
+func (r productRepositoryGateway) SaveProduct(product domain.Product) error {
 	inserProductCmd := fmt.Sprintf(sqlscripts.InsertProductCmd)
 
 	_, err := r.sqlClient.Exec(inserProductCmd, product.Name, product.SkuId, product.Description, product.Category,
@@ -89,7 +97,7 @@ func (r productRepository) SaveProduct(product domain.Product) error {
 	return nil
 }
 
-func (r productRepository) UpdateProduct(id int, product domain.Product) error {
+func (r productRepositoryGateway) UpdateProduct(id int, product domain.Product) error {
 	updateProductCmd := fmt.Sprintf(sqlscripts.UpdateProductCmd)
 
 	result, err := r.sqlClient.Exec(updateProductCmd, id, product.Name, product.SkuId, product.Description, product.Category,
@@ -110,7 +118,7 @@ func (r productRepository) UpdateProduct(id int, product domain.Product) error {
 	return nil
 }
 
-func (r productRepository) DeleteProduct(id int) error {
+func (r productRepositoryGateway) DeleteProduct(id int) error {
 	deleteProductCmd := fmt.Sprintf(sqlscripts.DeleteProductCmd)
 
 	result, err := r.sqlClient.Exec(deleteProductCmd, id)

@@ -1,24 +1,29 @@
-package repositories
+package gateways
 
 import (
 	"fmt"
 	"g37-lanchonete/internal/core/domain"
-	"g37-lanchonete/internal/core/ports"
 	"g37-lanchonete/internal/infra/clients/sql"
 	"g37-lanchonete/internal/infra/sqlscripts"
 )
 
-type customerRepository struct {
+type CustomerRepositoryGateway interface {
+	FindCustomerById(id int) (domain.Customer, error)
+	FindCustomerByCPF(cpf string) (domain.Customer, error)
+	SaveCustomer(customer domain.Customer) error
+}
+
+type customerRepositoryGateway struct {
 	sqlClient sql.SQLClient
 }
 
-func NewCustomerRepository(sqlClient sql.SQLClient) ports.CustomerRepository {
-	return customerRepository{
+func NewCustomerRepositoryGateway(sqlClient sql.SQLClient) CustomerRepositoryGateway {
+	return customerRepositoryGateway{
 		sqlClient: sqlClient,
 	}
 }
 
-func (r customerRepository) FindCustomerById(id int) (domain.Customer, error) {
+func (r customerRepositoryGateway) FindCustomerById(id int) (domain.Customer, error) {
 	getCustomerByIdQuery := fmt.Sprintf(sqlscripts.GetCustomerByIdQuery)
 
 	row := r.sqlClient.FindOne(getCustomerByIdQuery, id)
@@ -32,7 +37,7 @@ func (r customerRepository) FindCustomerById(id int) (domain.Customer, error) {
 	return customer, nil
 }
 
-func (r customerRepository) FindCustomerByCPF(cpf string) (domain.Customer, error) {
+func (r customerRepositoryGateway) FindCustomerByCPF(cpf string) (domain.Customer, error) {
 	getCustomerByIdQuery := fmt.Sprintf(sqlscripts.GetCustomerByCPFQuery)
 
 	row := r.sqlClient.FindOne(getCustomerByIdQuery, cpf)
@@ -46,7 +51,7 @@ func (r customerRepository) FindCustomerByCPF(cpf string) (domain.Customer, erro
 	return customer, nil
 }
 
-func (r customerRepository) SaveCustomer(customer domain.Customer) error {
+func (r customerRepositoryGateway) SaveCustomer(customer domain.Customer) error {
 	insertCustomerCmd := fmt.Sprintf(sqlscripts.InsertCustomer)
 
 	_, err := r.sqlClient.Exec(insertCustomerCmd, customer.Name, customer.Cpf, customer.Email, customer.CreatedAt, customer.UpdatedAt)

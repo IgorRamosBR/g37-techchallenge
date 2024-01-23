@@ -6,7 +6,7 @@ import (
 	"g37-lanchonete/internal/core/services"
 	"g37-lanchonete/internal/infra/clients"
 	"g37-lanchonete/internal/infra/clients/sql"
-	"g37-lanchonete/internal/infra/repositories"
+	"g37-lanchonete/internal/infra/gateways"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,14 +23,14 @@ func main() {
 
 	paymentBroker := clients.NewMercadoPagoBroker(httpClient, appConfig.PaymentBrokerURL)
 
-	customerRepository := repositories.NewCustomerRepository(postgresSQLClient)
-	productRepository := repositories.NewProductRepository(postgresSQLClient)
-	orderRepository := repositories.NewOrderRepository(postgresSQLClient)
+	customerRepositoryGateway := gateways.NewCustomerRepositoryGateway(postgresSQLClient)
+	productRepositoryGateway := gateways.NewProductRepositoryGateway(postgresSQLClient)
+	orderRepositoryGateway := gateways.NewOrderRepositoryGateway(postgresSQLClient)
 
-	customerService := services.NewCustomerService(customerRepository)
-	productService := services.NewProductService(productRepository)
+	customerService := services.NewCustomerService(customerRepositoryGateway)
+	productService := services.NewProductService(productRepositoryGateway)
 	paymentService := services.NewPaymentService(appConfig.NotificationURL, appConfig.SponsorId, paymentBroker)
-	orderService := services.NewOrderService(customerService, paymentService, productService, orderRepository)
+	orderService := services.NewOrderService(customerService, paymentService, productService, orderRepositoryGateway)
 
 	customerHandler := application.NewCustomerHandler(customerService)
 	productHandler := application.NewProductHandler(productService)
@@ -51,6 +51,7 @@ func main() {
 		v1.GET("/orders/:id/status", orderHandler.GetOrderStatus)
 		v1.PUT("/orders/:id/status", orderHandler.UpdateOrderStatus)
 		v1.POST("/orders", orderHandler.CreateOrder)
+
 	}
 
 	router.Run(":8080")

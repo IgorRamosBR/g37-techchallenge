@@ -1,25 +1,31 @@
-package repositories
+package gateways
 
 import (
 	"fmt"
 	"g37-lanchonete/internal/core/domain"
-	"g37-lanchonete/internal/core/ports"
 	"g37-lanchonete/internal/core/services/dto"
 	"g37-lanchonete/internal/infra/clients/sql"
 	"g37-lanchonete/internal/infra/sqlscripts"
 )
 
-type orderRepository struct {
+type OrderRepositoryGateway interface {
+	FindAllOrders(pageParams dto.PageParams) ([]domain.Order, error)
+	GetOrderStatus(orderId int) (string, error)
+	SaveOrder(order domain.Order) (int, error)
+	UpdateOrderStatus(orderId int, orderStatus string) error
+}
+
+type orderRepositoryGateway struct {
 	sqlClient sql.SQLClient
 }
 
-func NewOrderRepository(sqlClient sql.SQLClient) ports.OrderRepository {
-	return orderRepository{
+func NewOrderRepositoryGateway(sqlClient sql.SQLClient) OrderRepositoryGateway {
+	return orderRepositoryGateway{
 		sqlClient: sqlClient,
 	}
 }
 
-func (r orderRepository) FindAllOrders(pageParams dto.PageParams) ([]domain.Order, error) {
+func (r orderRepositoryGateway) FindAllOrders(pageParams dto.PageParams) ([]domain.Order, error) {
 	rows, err := r.sqlClient.Find(sqlscripts.FindAllOrdersQuery, pageParams.GetLimit(), pageParams.GetOffset())
 	if err != nil {
 		return nil, fmt.Errorf("failed to find all orders, error %w", err)
@@ -49,7 +55,7 @@ func (r orderRepository) FindAllOrders(pageParams dto.PageParams) ([]domain.Orde
 	return orders, nil
 }
 
-func (r orderRepository) GetOrderStatus(orderId int) (string, error) {
+func (r orderRepositoryGateway) GetOrderStatus(orderId int) (string, error) {
 	row := r.sqlClient.FindOne(sqlscripts.FindOrderStatusByIdQuery, orderId)
 
 	var status string
@@ -61,7 +67,7 @@ func (r orderRepository) GetOrderStatus(orderId int) (string, error) {
 	return status, nil
 }
 
-func (r orderRepository) SaveOrder(order domain.Order) (int, error) {
+func (r orderRepositoryGateway) SaveOrder(order domain.Order) (int, error) {
 	tx, err := r.sqlClient.Begin()
 	if err != nil {
 		return -1, fmt.Errorf("failed to create a transaction, error %w", err)
@@ -90,7 +96,7 @@ func (r orderRepository) SaveOrder(order domain.Order) (int, error) {
 	return orderId, nil
 }
 
-func (r orderRepository) UpdateOrderStatus(orderId int, orderStatus string) error {
+func (r orderRepositoryGateway) UpdateOrderStatus(orderId int, orderStatus string) error {
 	result, err := r.sqlClient.Exec(sqlscripts.UpdateOrderStatusCmd, orderId, orderStatus)
 	if err != nil {
 		return fmt.Errorf("failed to update order status, error %w", err)
@@ -108,7 +114,7 @@ func (r orderRepository) UpdateOrderStatus(orderId int, orderStatus string) erro
 	return nil
 }
 
-func (r orderRepository) getOrderItems(orderId int) ([]domain.OrderItem, error) {
+func (r orderRepositoryGateway) getOrderItems(orderId int) ([]domain.OrderItem, error) {
 	rows, err := r.sqlClient.Find(sqlscripts.FindOrderItems, orderId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find order items, error %w", err)
