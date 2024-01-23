@@ -2,18 +2,18 @@ package gateways
 
 import (
 	"fmt"
-	"g37-lanchonete/internal/core/domain"
+	"g37-lanchonete/internal/core/entities"
 	"g37-lanchonete/internal/core/services/dto"
 	"g37-lanchonete/internal/infra/drivers/sql"
 	"g37-lanchonete/internal/infra/gateways/sqlscripts"
 )
 
 type ProductRepositoryGateway interface {
-	FindAllProducts(pageParams dto.PageParams) ([]domain.Product, error)
-	FindProductsByCategory(pageParams dto.PageParams, category string) ([]domain.Product, error)
-	FindProductById(id int) (domain.Product, error)
-	SaveProduct(product domain.Product) error
-	UpdateProduct(id int, product domain.Product) error
+	FindAllProducts(pageParams dto.PageParams) ([]entities.Product, error)
+	FindProductsByCategory(pageParams dto.PageParams, category string) ([]entities.Product, error)
+	FindProductById(id int) (entities.Product, error)
+	SaveProduct(product entities.Product) error
+	UpdateProduct(id int, product entities.Product) error
 	DeleteProduct(id int) error
 }
 
@@ -27,7 +27,7 @@ func NewProductRepositoryGateway(sqlClient sql.SQLClient) ProductRepositoryGatew
 	}
 }
 
-func (r productRepositoryGateway) FindAllProducts(pageParams dto.PageParams) ([]domain.Product, error) {
+func (r productRepositoryGateway) FindAllProducts(pageParams dto.PageParams) ([]entities.Product, error) {
 	getAllProductsQuery := fmt.Sprintf(sqlscripts.GetAllProductsQuery, pageParams.GetLimit(), pageParams.GetOffset())
 
 	rows, err := r.sqlClient.Find(getAllProductsQuery)
@@ -36,9 +36,9 @@ func (r productRepositoryGateway) FindAllProducts(pageParams dto.PageParams) ([]
 	}
 	defer rows.Close()
 
-	products := []domain.Product{}
+	products := []entities.Product{}
 	for rows.Next() {
-		var product domain.Product
+		var product entities.Product
 		err = rows.Scan(&product.ID, &product.Name, &product.SkuId, &product.Description, &product.Category, &product.Price, &product.CreatedAt, &product.UpdatedAt)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan all products, error %w", err)
@@ -50,7 +50,7 @@ func (r productRepositoryGateway) FindAllProducts(pageParams dto.PageParams) ([]
 	return products, nil
 }
 
-func (r productRepositoryGateway) FindProductsByCategory(pageParams dto.PageParams, category string) ([]domain.Product, error) {
+func (r productRepositoryGateway) FindProductsByCategory(pageParams dto.PageParams, category string) ([]entities.Product, error) {
 	getProductsByCategoryQuery := fmt.Sprintf(sqlscripts.GetProductsByCategoryQuery, pageParams.GetLimit(), pageParams.GetOffset())
 
 	rows, err := r.sqlClient.Find(getProductsByCategoryQuery, category)
@@ -59,9 +59,9 @@ func (r productRepositoryGateway) FindProductsByCategory(pageParams dto.PagePara
 	}
 	defer rows.Close()
 
-	products := []domain.Product{}
+	products := []entities.Product{}
 	for rows.Next() {
-		var product domain.Product
+		var product entities.Product
 		err = rows.Scan(&product.ID, &product.Name, &product.SkuId, &product.Description, &product.Category, &product.Price, &product.CreatedAt, &product.UpdatedAt)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan products by category, error %w", err)
@@ -73,19 +73,19 @@ func (r productRepositoryGateway) FindProductsByCategory(pageParams dto.PagePara
 	return products, nil
 }
 
-func (r productRepositoryGateway) FindProductById(id int) (domain.Product, error) {
+func (r productRepositoryGateway) FindProductById(id int) (entities.Product, error) {
 	row := r.sqlClient.FindOne(sqlscripts.GetProductByIdQuery, id)
 
-	var product domain.Product
+	var product entities.Product
 	err := row.Scan(&product.ID, &product.Name, &product.SkuId, &product.Description, &product.Category, &product.Price, &product.CreatedAt, &product.UpdatedAt)
 	if err != nil {
-		return domain.Product{}, fmt.Errorf("failed to find product by id, error %w", err)
+		return entities.Product{}, fmt.Errorf("failed to find product by id, error %w", err)
 	}
 
 	return product, nil
 }
 
-func (r productRepositoryGateway) SaveProduct(product domain.Product) error {
+func (r productRepositoryGateway) SaveProduct(product entities.Product) error {
 	inserProductCmd := fmt.Sprintf(sqlscripts.InsertProductCmd)
 
 	_, err := r.sqlClient.Exec(inserProductCmd, product.Name, product.SkuId, product.Description, product.Category,
@@ -97,7 +97,7 @@ func (r productRepositoryGateway) SaveProduct(product domain.Product) error {
 	return nil
 }
 
-func (r productRepositoryGateway) UpdateProduct(id int, product domain.Product) error {
+func (r productRepositoryGateway) UpdateProduct(id int, product entities.Product) error {
 	updateProductCmd := fmt.Sprintf(sqlscripts.UpdateProductCmd)
 
 	result, err := r.sqlClient.Exec(updateProductCmd, id, product.Name, product.SkuId, product.Description, product.Category,

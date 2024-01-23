@@ -1,7 +1,7 @@
 package services
 
 import (
-	"g37-lanchonete/internal/core/domain"
+	"g37-lanchonete/internal/core/entities"
 	"g37-lanchonete/internal/core/ports"
 	"g37-lanchonete/internal/core/services/dto"
 	"g37-lanchonete/internal/infra/gateways"
@@ -21,33 +21,33 @@ func NewProductService(productRepositoryGateway gateways.ProductRepositoryGatewa
 	}
 }
 
-func (s productService) GetAllProducts(pageParameters dto.PageParams) (dto.Page[domain.Product], error) {
+func (s productService) GetAllProducts(pageParameters dto.PageParams) (dto.Page[entities.Product], error) {
 	products, err := s.productRepositoryGateway.FindAllProducts(pageParameters)
 	if err != nil {
 		log.Errorf("failed to get all products, error: %v", err)
-		return dto.Page[domain.Product]{}, err
+		return dto.Page[entities.Product]{}, err
 	}
 
-	page := dto.BuildPage[domain.Product](products, pageParameters)
+	page := dto.BuildPage[entities.Product](products, pageParameters)
 	return page, nil
 }
 
-func (s productService) GetProductsByCategory(pageParameters dto.PageParams, category string) (dto.Page[domain.Product], error) {
+func (s productService) GetProductsByCategory(pageParameters dto.PageParams, category string) (dto.Page[entities.Product], error) {
 	products, err := s.productRepositoryGateway.FindProductsByCategory(pageParameters, category)
 	if err != nil {
 		log.Errorf("failed to get products by category, error: %v", err)
-		return dto.Page[domain.Product]{}, err
+		return dto.Page[entities.Product]{}, err
 	}
 
-	page := dto.BuildPage[domain.Product](products, pageParameters)
+	page := dto.BuildPage[entities.Product](products, pageParameters)
 	return page, nil
 }
 
-func (s productService) GetProductById(id int) (domain.Product, error) {
+func (s productService) GetProductById(id int) (entities.Product, error) {
 	product, err := s.productRepositoryGateway.FindProductById(id)
 	if err != nil {
 		log.Errorf("failed to get product by id, error: %v", err)
-		return domain.Product{}, err
+		return entities.Product{}, err
 	}
 
 	return product, nil

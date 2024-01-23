@@ -2,16 +2,16 @@ package gateways
 
 import (
 	"fmt"
-	"g37-lanchonete/internal/core/domain"
+	"g37-lanchonete/internal/core/entities"
 	"g37-lanchonete/internal/core/services/dto"
 	"g37-lanchonete/internal/infra/drivers/sql"
 	"g37-lanchonete/internal/infra/gateways/sqlscripts"
 )
 
 type OrderRepositoryGateway interface {
-	FindAllOrders(pageParams dto.PageParams) ([]domain.Order, error)
+	FindAllOrders(pageParams dto.PageParams) ([]entities.Order, error)
 	GetOrderStatus(orderId int) (string, error)
-	SaveOrder(order domain.Order) (int, error)
+	SaveOrder(order entities.Order) (int, error)
 	UpdateOrderStatus(orderId int, orderStatus string) error
 }
 
@@ -25,16 +25,16 @@ func NewOrderRepositoryGateway(sqlClient sql.SQLClient) OrderRepositoryGateway {
 	}
 }
 
-func (r orderRepositoryGateway) FindAllOrders(pageParams dto.PageParams) ([]domain.Order, error) {
+func (r orderRepositoryGateway) FindAllOrders(pageParams dto.PageParams) ([]entities.Order, error) {
 	rows, err := r.sqlClient.Find(sqlscripts.FindAllOrdersQuery, pageParams.GetLimit(), pageParams.GetOffset())
 	if err != nil {
 		return nil, fmt.Errorf("failed to find all orders, error %w", err)
 	}
 
-	orders := []domain.Order{}
+	orders := []entities.Order{}
 	for rows.Next() {
-		var order domain.Order
-		var customer domain.Customer
+		var order entities.Order
+		var customer entities.Customer
 
 		err = rows.Scan(&order.ID, &order.Coupon, &order.TotalAmount, &order.Status, &order.CreatedAt,
 			&customer.ID, &customer.Name, &customer.Cpf, &customer.Email, &customer.CreatedAt, &customer.UpdatedAt)
@@ -67,7 +67,7 @@ func (r orderRepositoryGateway) GetOrderStatus(orderId int) (string, error) {
 	return status, nil
 }
 
-func (r orderRepositoryGateway) SaveOrder(order domain.Order) (int, error) {
+func (r orderRepositoryGateway) SaveOrder(order entities.Order) (int, error) {
 	tx, err := r.sqlClient.Begin()
 	if err != nil {
 		return -1, fmt.Errorf("failed to create a transaction, error %w", err)
@@ -114,16 +114,16 @@ func (r orderRepositoryGateway) UpdateOrderStatus(orderId int, orderStatus strin
 	return nil
 }
 
-func (r orderRepositoryGateway) getOrderItems(orderId int) ([]domain.OrderItem, error) {
+func (r orderRepositoryGateway) getOrderItems(orderId int) ([]entities.OrderItem, error) {
 	rows, err := r.sqlClient.Find(sqlscripts.FindOrderItems, orderId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find order items, error %w", err)
 	}
 
-	orderItems := []domain.OrderItem{}
+	orderItems := []entities.OrderItem{}
 	for rows.Next() {
-		var orderItem domain.OrderItem
-		var product domain.Product
+		var orderItem entities.OrderItem
+		var product entities.Product
 
 		err = rows.Scan(&orderItem.ID, &product.ID, &product.Name, &product.SkuId, &product.Description,
 			&product.Category, &product.Price, &product.CreatedAt, &product.UpdatedAt, &orderItem.Quantity, &orderItem.Type)

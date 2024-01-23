@@ -1,7 +1,7 @@
 package services
 
 import (
-	"g37-lanchonete/internal/core/domain"
+	"g37-lanchonete/internal/core/entities"
 	"g37-lanchonete/internal/core/ports"
 	"g37-lanchonete/internal/core/services/dto"
 	"g37-lanchonete/internal/infra/gateways"
@@ -34,21 +34,21 @@ func (s customerService) CreateCustomer(customerDTO dto.CustomerDTO) error {
 	return nil
 }
 
-func (s customerService) GetCustomerById(id int) (domain.Customer, error) {
+func (s customerService) GetCustomerById(id int) (entities.Customer, error) {
 	customer, err := s.customerRepositoryGateway.FindCustomerById(id)
 	if err != nil {
 		log.Errorf("failed to get customer by id [%d], error: %v", id, err)
-		return domain.Customer{}, err
+		return entities.Customer{}, err
 	}
 
 	return customer, nil
 }
 
-func (s customerService) GetCustomerByCPF(cpf string) (domain.Customer, error) {
+func (s customerService) GetCustomerByCPF(cpf string) (entities.Customer, error) {
 	customer, err := s.customerRepositoryGateway.FindCustomerByCPF(cpf)
 	if err != nil {
 		log.Errorf("failed to get customer by cpf [%s], error: %v", cpf, err)
-		return domain.Customer{}, err
+		return entities.Customer{}, err
 	}
 
 	return customer, nil

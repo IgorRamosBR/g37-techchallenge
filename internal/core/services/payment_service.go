@@ -2,7 +2,7 @@ package services
 
 import (
 	"fmt"
-	"g37-lanchonete/internal/core/domain"
+	"g37-lanchonete/internal/core/entities"
 	"g37-lanchonete/internal/core/services/dto"
 	"g37-lanchonete/internal/infra/drivers/payment"
 	"strconv"
@@ -11,7 +11,7 @@ import (
 )
 
 type PaymentService interface {
-	GeneratePaymentQRCode(order domain.Order) (string, error)
+	GeneratePaymentQRCode(order entities.Order) (string, error)
 }
 
 type paymentService struct {
@@ -28,7 +28,7 @@ func NewPaymentService(notificationUrl, sponsorId string, paymentBroker payment.
 	}
 }
 
-func (p paymentService) GeneratePaymentQRCode(order domain.Order) (string, error) {
+func (p paymentService) GeneratePaymentQRCode(order entities.Order) (string, error) {
 	paymentRequest := p.createPaymentRequest(order)
 	paymentResponse, err := p.paymentBroker.GeneratePaymentQRCode(paymentRequest)
 	if err != nil {
@@ -39,7 +39,7 @@ func (p paymentService) GeneratePaymentQRCode(order domain.Order) (string, error
 	return paymentResponse.QrData, nil
 }
 
-func (p paymentService) createPaymentRequest(order domain.Order) dto.PaymentQRCodeRequest {
+func (p paymentService) createPaymentRequest(order entities.Order) dto.PaymentQRCodeRequest {
 	var items []dto.PaymentItemRequest
 	for _, item := range order.Items {
 		items = append(items, createPaymentItem(item))
@@ -55,7 +55,7 @@ func (p paymentService) createPaymentRequest(order domain.Order) dto.PaymentQRCo
 	}
 }
 
-func createPaymentItem(item domain.OrderItem) dto.PaymentItemRequest {
+func createPaymentItem(item entities.OrderItem) dto.PaymentItemRequest {
 	paymentItem := dto.PaymentItemRequest{
 		SkuNumber:   item.Product.SkuId,
 		Category:    item.Product.Category,

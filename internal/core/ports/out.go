@@ -1,9 +1,9 @@
 package ports
 
 import (
-	"g37-lanchonete/internal/core/domain"
+	"g37-lanchonete/internal/core/entities"
 )
 
 type PaymentOrderRepository interface {
-	SavePaymentOrder(domain.PaymentOrder) error
+	SavePaymentOrder(entities.PaymentOrder) error
 }

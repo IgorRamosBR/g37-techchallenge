@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"g37-lanchonete/internal/core/domain"
+	"g37-lanchonete/internal/core/entities"
 
 	"github.com/asaskevich/govalidator"
 )
@@ -14,8 +14,8 @@ type ProductDTO struct {
 	Price       float64 `json:"price" valid:"float,required~Price is required|range(0.01|)~Price greater than 0.00"`
 }
 
-func (p ProductDTO) ToProduct() domain.Product {
-	return domain.Product{
+func (p ProductDTO) ToProduct() entities.Product {
+	return entities.Product{
 		Name:        p.Name,
 		SkuId:       p.SkuId,
 		Description: p.Description,

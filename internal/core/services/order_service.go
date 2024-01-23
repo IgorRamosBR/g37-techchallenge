@@ -1,7 +1,7 @@
 package services
 
 import (
-	"g37-lanchonete/internal/core/domain"
+	"g37-lanchonete/internal/core/entities"
 	"g37-lanchonete/internal/core/ports"
 	"g37-lanchonete/internal/core/services/dto"
 	"g37-lanchonete/internal/infra/gateways"
@@ -25,14 +25,14 @@ func NewOrderService(customerService ports.CustomerService, paymentService ports
 	}
 }
 
-func (s orderService) GetAllOrders(pageParams dto.PageParams) (dto.Page[domain.Order], error) {
+func (s orderService) GetAllOrders(pageParams dto.PageParams) (dto.Page[entities.Order], error) {
 	orders, err := s.orderRepositoryGateway.FindAllOrders(pageParams)
 	if err != nil {
 		log.Errorf("failed to get all orders, error: %v", err)
-		return dto.Page[domain.Order]{}, err
+		return dto.Page[entities.Order]{}, err
 	}
 
-	page := dto.BuildPage[domain.Order](orders, pageParams)
+	page := dto.BuildPage[entities.Order](orders, pageParams)
 	return page, nil
 }
 
@@ -80,7 +80,7 @@ func (s orderService) CreateOrder(orderDTO dto.OrderDTO) (dto.OrderCreationRespo
 	return response, nil
 }
 
-func (s orderService) calculateProducts(items []domain.OrderItem) (float64, error) {
+func (s orderService) calculateProducts(items []entities.OrderItem) (float64, error) {
 	for i, item := range items {
 		product, err := s.getProduct(item.Product.ID)
 		if err != nil {
@@ -95,17 +95,17 @@ func (s orderService) calculateProducts(items []domain.OrderItem) (float64, erro
 	return totalAmount, nil
 }
 
-func (s orderService) getProduct(id int) (domain.Product, error) {
+func (s orderService) getProduct(id int) (entities.Product, error) {
 	product, err := s.productService.GetProductById(id)
 	if err != nil {
 		log.Errorf("failed to find product [%d] to process order, error: %v", id, err)
-		return domain.Product{}, err
+		return entities.Product{}, err
 	}
 
 	return product, nil
 }
 
-func (s orderService) calculateTotal(items []domain.OrderItem) float64 {
+func (s orderService) calculateTotal(items []entities.OrderItem) float64 {
 	var total float64
 	for _, item := range items {
 		total += item.Product.Price * float64(item.Quantity)
@@ -113,7 +113,7 @@ func (s orderService) calculateTotal(items []domain.OrderItem) float64 {
 	return total
 }
 
-func (s orderService) saveOrder(order domain.Order) (int, error) {
+func (s orderService) saveOrder(order entities.Order) (int, error) {
 	orderId, err := s.orderRepositoryGateway.SaveOrder(order)
 	if err != nil {
 		return 0, err
