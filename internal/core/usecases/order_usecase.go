@@ -1,32 +1,38 @@
-package services
+package usecases
 
 import (
 	"g37-lanchonete/internal/core/entities"
-	"g37-lanchonete/internal/core/ports"
-	"g37-lanchonete/internal/core/services/dto"
+	"g37-lanchonete/internal/core/usecases/dto"
 	"g37-lanchonete/internal/infra/gateways"
 
 	log "github.com/sirupsen/logrus"
 )
 
-type orderService struct {
-	customerService        ports.CustomerService
-	paymentService         ports.PaymentService
-	productService         ports.ProductService
+type OrderUsecase interface {
+	GetAllOrders(pageParameters dto.PageParams) (dto.Page[entities.Order], error)
+	GetOrderStatus(orderId int) (dto.OrderStatusDTO, error)
+	UpdateOrderStatus(orderId int, orderStatus string) error
+	CreateOrder(orderDTO dto.OrderDTO) (dto.OrderCreationResponse, error)
+}
+
+type orderUsecase struct {
+	customerUsecase        CustomerUsecase
+	paymentUsecase         PaymentUsecase
+	productUsecase         ProductUsecase
 	orderRepositoryGateway gateways.OrderRepositoryGateway
 }
 
-func NewOrderService(customerService ports.CustomerService, paymentService ports.PaymentService, productService ports.ProductService, orderRepositoryGateway gateways.OrderRepositoryGateway) ports.OrderService {
-	return orderService{
-		customerService:        customerService,
-		paymentService:         paymentService,
-		productService:         productService,
+func NewOrderUsecase(customerUsecase CustomerUsecase, paymentUsecase PaymentUsecase, productUsecase ProductUsecase, orderRepositoryGateway gateways.OrderRepositoryGateway) OrderUsecase {
+	return orderUsecase{
+		customerUsecase:        customerUsecase,
+		paymentUsecase:         paymentUsecase,
+		productUsecase:         productUsecase,
 		orderRepositoryGateway: orderRepositoryGateway,
 	}
 }
 
-func (s orderService) GetAllOrders(pageParams dto.PageParams) (dto.Page[entities.Order], error) {
-	orders, err := s.orderRepositoryGateway.FindAllOrders(pageParams)
+func (u orderUsecase) GetAllOrders(pageParams dto.PageParams) (dto.Page[entities.Order], error) {
+	orders, err := u.orderRepositoryGateway.FindAllOrders(pageParams)
 	if err != nil {
 		log.Errorf("failed to get all orders, error: %v", err)
 		return dto.Page[entities.Order]{}, err
@@ -36,9 +42,9 @@ func (s orderService) GetAllOrders(pageParams dto.PageParams) (dto.Page[entities
 	return page, nil
 }
 
-func (s orderService) CreateOrder(orderDTO dto.OrderDTO) (dto.OrderCreationResponse, error) {
+func (u orderUsecase) CreateOrder(orderDTO dto.OrderDTO) (dto.OrderCreationResponse, error) {
 	// Obter o cliente pelo ID
-	customer, err := s.customerService.GetCustomerById(orderDTO.CustomerId)
+	customer, err := u.customerUsecase.GetCustomerById(orderDTO.CustomerId)
 	if err != nil {
 		log.Errorf("failed to get customer [%d], error: %v", orderDTO.CustomerId, err)
 		return dto.OrderCreationResponse{}, err
@@ -48,7 +54,7 @@ func (s orderService) CreateOrder(orderDTO dto.OrderDTO) (dto.OrderCreationRespo
 	order := orderDTO.ToOrder(customer)
 
 	// Calcular o total dos produtos
-	totalAmount, err := s.calculateProducts(order.Items)
+	totalAmount, err := u.calculateProducts(order.Items)
 	if err != nil {
 		log.Errorf("failed to calculate products, error: %v", err)
 		return dto.OrderCreationResponse{}, err
@@ -58,14 +64,14 @@ func (s orderService) CreateOrder(orderDTO dto.OrderDTO) (dto.OrderCreationRespo
 	order.TotalAmount = totalAmount
 
 	// Salvar o pedido no banco de dados
-	order.ID, err = s.saveOrder(order)
+	order.ID, err = u.saveOrder(order)
 	if err != nil {
 		log.Errorf("failed to save order, error: %v", err)
 		return dto.OrderCreationResponse{}, err
 	}
 
 	// Gerar o código QR para o pagamento
-	paymentQRCode, err := s.paymentService.GeneratePaymentQRCode(order)
+	paymentQRCode, err := u.paymentUsecase.GeneratePaymentQRCode(order)
 	if err != nil {
 		log.Errorf("failed to process payment order, error: %v", err)
 		return dto.OrderCreationResponse{}, err
@@ -80,9 +86,9 @@ func (s orderService) CreateOrder(orderDTO dto.OrderDTO) (dto.OrderCreationRespo
 	return response, nil
 }
 
-func (s orderService) calculateProducts(items []entities.OrderItem) (float64, error) {
+func (u orderUsecase) calculateProducts(items []entities.OrderItem) (float64, error) {
 	for i, item := range items {
-		product, err := s.getProduct(item.Product.ID)
+		product, err := u.getProduct(item.Product.ID)
 		if err != nil {
 			log.Errorf("failed to find products to process order, error: %v", err)
 			return 0.0, err
@@ -91,12 +97,12 @@ func (s orderService) calculateProducts(items []entities.OrderItem) (float64, er
 		items[i] = item
 	}
 
-	totalAmount := s.calculateTotal(items)
+	totalAmount := u.calculateTotal(items)
 	return totalAmount, nil
 }
 
-func (s orderService) getProduct(id int) (entities.Product, error) {
-	product, err := s.productService.GetProductById(id)
+func (u orderUsecase) getProduct(id int) (entities.Product, error) {
+	product, err := u.productUsecase.GetProductById(id)
 	if err != nil {
 		log.Errorf("failed to find product [%d] to process order, error: %v", id, err)
 		return entities.Product{}, err
@@ -105,7 +111,7 @@ func (s orderService) getProduct(id int) (entities.Product, error) {
 	return product, nil
 }
 
-func (s orderService) calculateTotal(items []entities.OrderItem) float64 {
+func (u orderUsecase) calculateTotal(items []entities.OrderItem) float64 {
 	var total float64
 	for _, item := range items {
 		total += item.Product.Price * float64(item.Quantity)
@@ -113,8 +119,8 @@ func (s orderService) calculateTotal(items []entities.OrderItem) float64 {
 	return total
 }
 
-func (s orderService) saveOrder(order entities.Order) (int, error) {
-	orderId, err := s.orderRepositoryGateway.SaveOrder(order)
+func (u orderUsecase) saveOrder(order entities.Order) (int, error) {
+	orderId, err := u.orderRepositoryGateway.SaveOrder(order)
 	if err != nil {
 		return 0, err
 	}
@@ -122,8 +128,8 @@ func (s orderService) saveOrder(order entities.Order) (int, error) {
 	return orderId, nil
 }
 
-func (s orderService) GetOrderStatus(orderId int) (dto.OrderStatusDTO, error) {
-	status, err := s.orderRepositoryGateway.GetOrderStatus(orderId)
+func (u orderUsecase) GetOrderStatus(orderId int) (dto.OrderStatusDTO, error) {
+	status, err := u.orderRepositoryGateway.GetOrderStatus(orderId)
 	if err != nil {
 		return dto.OrderStatusDTO{}, err
 	}
@@ -133,8 +139,8 @@ func (s orderService) GetOrderStatus(orderId int) (dto.OrderStatusDTO, error) {
 	}, nil
 }
 
-func (s orderService) UpdateOrderStatus(orderId int, orderStatus string) error {
-	err := s.orderRepositoryGateway.UpdateOrderStatus(orderId, orderStatus)
+func (u orderUsecase) UpdateOrderStatus(orderId int, orderStatus string) error {
+	err := u.orderRepositoryGateway.UpdateOrderStatus(orderId, orderStatus)
 	if err != nil {
 		return err
 	}

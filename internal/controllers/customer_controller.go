@@ -2,20 +2,20 @@ package controllers
 
 import (
 	"errors"
-	"g37-lanchonete/internal/core/ports"
-	"g37-lanchonete/internal/core/services/dto"
+	"g37-lanchonete/internal/core/usecases"
+	"g37-lanchonete/internal/core/usecases/dto"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 type CustomeController struct {
-	customerService ports.CustomerService
+	customerUsecase usecases.CustomerUsecase
 }
 
-func NewCustomerController(customerService ports.CustomerService) CustomeController {
+func NewCustomerController(customerUsecase usecases.CustomerUsecase) CustomeController {
 	return CustomeController{
-		customerService: customerService,
+		customerUsecase: customerUsecase,
 	}
 }
 
@@ -33,7 +33,7 @@ func (c CustomeController) SaveCustomer(ctx *gin.Context) {
 		return
 	}
 
-	err = c.customerService.CreateCustomer(customer)
+	err = c.customerUsecase.CreateCustomer(customer)
 	if err != nil {
 		handleInternalServerResponse(ctx, "failed to create customer", err)
 		return
@@ -49,7 +49,7 @@ func (c CustomeController) GetCustomers(ctx *gin.Context) {
 		return
 	}
 
-	customer, err := c.customerService.GetCustomerByCPF(cpf)
+	customer, err := c.customerUsecase.GetCustomerByCPF(cpf)
 	if err != nil {
 		handleNotFoundRequestResponse(ctx, "failed to find customer", err)
 		return

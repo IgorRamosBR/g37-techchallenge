@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"g37-lanchonete/internal/core/services/dto"
+	"g37-lanchonete/internal/core/usecases/dto"
 	"strconv"
 
 	"github.com/gin-gonic/gin"

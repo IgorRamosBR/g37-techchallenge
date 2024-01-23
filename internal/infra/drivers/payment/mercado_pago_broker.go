@@ -3,7 +3,7 @@ package payment
 import (
 	"encoding/json"
 	"fmt"
-	"g37-lanchonete/internal/core/services/dto"
+	"g37-lanchonete/internal/core/usecases/dto"
 	"g37-lanchonete/internal/infra/drivers/http"
 )
 

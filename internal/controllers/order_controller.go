@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"errors"
-	"g37-lanchonete/internal/core/ports"
-	"g37-lanchonete/internal/core/services/dto"
+	"g37-lanchonete/internal/core/usecases"
+	"g37-lanchonete/internal/core/usecases/dto"
 	"net/http"
 	"strconv"
 
@@ -11,12 +11,12 @@ import (
 )
 
 type OrderController struct {
-	orderService ports.OrderService
+	orderUsecase usecases.OrderUsecase
 }
 
-func NewOrderController(orderService ports.OrderService) OrderController {
+func NewOrderController(orderUsecase usecases.OrderUsecase) OrderController {
 	return OrderController{
-		orderService: orderService,
+		orderUsecase: orderUsecase,
 	}
 }
 
@@ -34,7 +34,7 @@ func (c OrderController) CreateOrder(ctx *gin.Context) {
 		return
 	}
 
-	createResponse, err := c.orderService.CreateOrder(order)
+	createResponse, err := c.orderUsecase.CreateOrder(order)
 	if err != nil {
 		handleInternalServerResponse(ctx, "failed to create product", err)
 		return
@@ -49,7 +49,7 @@ func (c OrderController) GetAllOrders(ctx *gin.Context) {
 		handleBadRequestResponse(ctx, "invalid query parameters", err)
 	}
 
-	page, err := c.orderService.GetAllOrders(pageParams)
+	page, err := c.orderUsecase.GetAllOrders(pageParams)
 	if err != nil {
 		handleInternalServerResponse(ctx, "failed to get all orders", err)
 		return
@@ -71,7 +71,7 @@ func (c OrderController) GetOrderStatus(ctx *gin.Context) {
 		return
 	}
 
-	response, err := c.orderService.GetOrderStatus(orderID)
+	response, err := c.orderUsecase.GetOrderStatus(orderID)
 	if err != nil {
 		handleInternalServerResponse(ctx, "failed to get order status", err)
 		return
@@ -107,7 +107,7 @@ func (c OrderController) UpdateOrderStatus(ctx *gin.Context) {
 		return
 	}
 
-	err = c.orderService.UpdateOrderStatus(orderId, string(orderStatus.Status))
+	err = c.orderUsecase.UpdateOrderStatus(orderId, string(orderStatus.Status))
 	if err != nil {
 		handleInternalServerResponse(ctx, "failed to update order status", err)
 		return

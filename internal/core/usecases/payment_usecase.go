@@ -1,36 +1,36 @@
-package services
+package usecases
 
 import (
 	"fmt"
 	"g37-lanchonete/internal/core/entities"
-	"g37-lanchonete/internal/core/services/dto"
+	"g37-lanchonete/internal/core/usecases/dto"
 	"g37-lanchonete/internal/infra/drivers/payment"
 	"strconv"
 
 	log "github.com/sirupsen/logrus"
 )
 
-type PaymentService interface {
+type PaymentUsecase interface {
 	GeneratePaymentQRCode(order entities.Order) (string, error)
 }
 
-type paymentService struct {
+type paymentUsecase struct {
 	notificationUrl string
 	sponsorId       string
 	paymentBroker   payment.PaymentBroker
 }
 
-func NewPaymentService(notificationUrl, sponsorId string, paymentBroker payment.PaymentBroker) PaymentService {
-	return paymentService{
+func NewPaymentUsecase(notificationUrl, sponsorId string, paymentBroker payment.PaymentBroker) PaymentUsecase {
+	return paymentUsecase{
 		notificationUrl: notificationUrl,
 		sponsorId:       sponsorId,
 		paymentBroker:   paymentBroker,
 	}
 }
 
-func (p paymentService) GeneratePaymentQRCode(order entities.Order) (string, error) {
-	paymentRequest := p.createPaymentRequest(order)
-	paymentResponse, err := p.paymentBroker.GeneratePaymentQRCode(paymentRequest)
+func (u paymentUsecase) GeneratePaymentQRCode(order entities.Order) (string, error) {
+	paymentRequest := u.createPaymentRequest(order)
+	paymentResponse, err := u.paymentBroker.GeneratePaymentQRCode(paymentRequest)
 	if err != nil {
 		log.Errorf("failed to generate payment qrcode for the order [%d], error: %v", order.ID, err)
 		return "", err
@@ -39,7 +39,7 @@ func (p paymentService) GeneratePaymentQRCode(order entities.Order) (string, err
 	return paymentResponse.QrData, nil
 }
 
-func (p paymentService) createPaymentRequest(order entities.Order) dto.PaymentQRCodeRequest {
+func (u paymentUsecase) createPaymentRequest(order entities.Order) dto.PaymentQRCodeRequest {
 	var items []dto.PaymentItemRequest
 	for _, item := range order.Items {
 		items = append(items, createPaymentItem(item))
@@ -48,10 +48,10 @@ func (p paymentService) createPaymentRequest(order entities.Order) dto.PaymentQR
 	return dto.PaymentQRCodeRequest{
 		ExternalReference: strconv.FormatUint(uint64(order.ID), 10),
 		Title:             fmt.Sprintf("Order %d for the Customer[%d]", order.ID, order.Customer.ID),
-		NotificationURL:   p.notificationUrl,
+		NotificationURL:   u.notificationUrl,
 		TotalAmount:       order.TotalAmount,
 		Items:             items,
-		Sponsor:           p.sponsorId,
+		Sponsor:           u.sponsorId,
 	}
 }
 

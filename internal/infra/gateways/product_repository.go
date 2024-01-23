@@ -3,7 +3,7 @@ package gateways
 import (
 	"fmt"
 	"g37-lanchonete/internal/core/entities"
-	"g37-lanchonete/internal/core/services/dto"
+	"g37-lanchonete/internal/core/usecases/dto"
 	"g37-lanchonete/internal/infra/drivers/sql"
 	"g37-lanchonete/internal/infra/gateways/sqlscripts"
 )

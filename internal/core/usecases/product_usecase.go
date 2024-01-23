@@ -1,9 +1,8 @@
-package services
+package usecases
 
 import (
 	"g37-lanchonete/internal/core/entities"
-	"g37-lanchonete/internal/core/ports"
-	"g37-lanchonete/internal/core/services/dto"
+	"g37-lanchonete/internal/core/usecases/dto"
 	"g37-lanchonete/internal/infra/gateways"
 	"strconv"
 	"time"
@@ -11,18 +10,27 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type productService struct {
+type ProductUsecase interface {
+	GetAllProducts(pageParameters dto.PageParams) (dto.Page[entities.Product], error)
+	GetProductsByCategory(pageParameters dto.PageParams, category string) (dto.Page[entities.Product], error)
+	GetProductById(id int) (entities.Product, error)
+	CreateProduct(productDTO dto.ProductDTO) error
+	UpdateProduct(id string, productDTO dto.ProductDTO) error
+	DeleteProduct(id string) error
+}
+
+type productUsecase struct {
 	productRepositoryGateway gateways.ProductRepositoryGateway
 }
 
-func NewProductService(productRepositoryGateway gateways.ProductRepositoryGateway) ports.ProductService {
-	return productService{
+func NewProductUsecase(productRepositoryGateway gateways.ProductRepositoryGateway) ProductUsecase {
+	return productUsecase{
 		productRepositoryGateway: productRepositoryGateway,
 	}
 }
 
-func (s productService) GetAllProducts(pageParameters dto.PageParams) (dto.Page[entities.Product], error) {
-	products, err := s.productRepositoryGateway.FindAllProducts(pageParameters)
+func (u productUsecase) GetAllProducts(pageParameters dto.PageParams) (dto.Page[entities.Product], error) {
+	products, err := u.productRepositoryGateway.FindAllProducts(pageParameters)
 	if err != nil {
 		log.Errorf("failed to get all products, error: %v", err)
 		return dto.Page[entities.Product]{}, err
@@ -32,8 +40,8 @@ func (s productService) GetAllProducts(pageParameters dto.PageParams) (dto.Page[
 	return page, nil
 }
 
-func (s productService) GetProductsByCategory(pageParameters dto.PageParams, category string) (dto.Page[entities.Product], error) {
-	products, err := s.productRepositoryGateway.FindProductsByCategory(pageParameters, category)
+func (u productUsecase) GetProductsByCategory(pageParameters dto.PageParams, category string) (dto.Page[entities.Product], error) {
+	products, err := u.productRepositoryGateway.FindProductsByCategory(pageParameters, category)
 	if err != nil {
 		log.Errorf("failed to get products by category, error: %v", err)
 		return dto.Page[entities.Product]{}, err
@@ -43,8 +51,8 @@ func (s productService) GetProductsByCategory(pageParameters dto.PageParams, cat
 	return page, nil
 }
 
-func (s productService) GetProductById(id int) (entities.Product, error) {
-	product, err := s.productRepositoryGateway.FindProductById(id)
+func (u productUsecase) GetProductById(id int) (entities.Product, error) {
+	product, err := u.productRepositoryGateway.FindProductById(id)
 	if err != nil {
 		log.Errorf("failed to get product by id, error: %v", err)
 		return entities.Product{}, err
@@ -53,12 +61,12 @@ func (s productService) GetProductById(id int) (entities.Product, error) {
 	return product, nil
 }
 
-func (s productService) CreateProduct(productDTO dto.ProductDTO) error {
+func (u productUsecase) CreateProduct(productDTO dto.ProductDTO) error {
 	product := productDTO.ToProduct()
 	product.CreatedAt = time.Now()
 	product.UpdatedAt = time.Now()
 
-	err := s.productRepositoryGateway.SaveProduct(product)
+	err := u.productRepositoryGateway.SaveProduct(product)
 	if err != nil {
 		log.Errorf("failed to save product, error: %v", err)
 		return err
@@ -67,7 +75,7 @@ func (s productService) CreateProduct(productDTO dto.ProductDTO) error {
 	return nil
 }
 
-func (s productService) UpdateProduct(idStr string, productDTO dto.ProductDTO) error {
+func (u productUsecase) UpdateProduct(idStr string, productDTO dto.ProductDTO) error {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		log.Errorf("failed to parse id [%s], error: %v", idStr, err)
@@ -76,7 +84,7 @@ func (s productService) UpdateProduct(idStr string, productDTO dto.ProductDTO) e
 
 	product := productDTO.ToProduct()
 	product.UpdatedAt = time.Now()
-	err = s.productRepositoryGateway.UpdateProduct(id, product)
+	err = u.productRepositoryGateway.UpdateProduct(id, product)
 	if err != nil {
 		log.Errorf("failed to update product, error: %v", err)
 		return err
@@ -85,14 +93,14 @@ func (s productService) UpdateProduct(idStr string, productDTO dto.ProductDTO) e
 	return nil
 }
 
-func (s productService) DeleteProduct(idStr string) error {
+func (u productUsecase) DeleteProduct(idStr string) error {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		log.Errorf("failed to parse id [%s], error: %v", idStr, err)
 		return err
 	}
 
-	err = s.productRepositoryGateway.DeleteProduct(id)
+	err = u.productRepositoryGateway.DeleteProduct(id)
 	if err != nil {
 		log.Errorf("failed to delete product, error: %v", err)
 		return err

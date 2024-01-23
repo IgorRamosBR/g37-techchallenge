@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"errors"
-	"g37-lanchonete/internal/core/ports"
-	"g37-lanchonete/internal/core/services/dto"
+	"g37-lanchonete/internal/core/usecases"
+	"g37-lanchonete/internal/core/usecases/dto"
 	"g37-lanchonete/internal/infra/drivers/sql"
 	"net/http"
 
@@ -11,12 +11,12 @@ import (
 )
 
 type ProductController struct {
-	productService ports.ProductService
+	productUsecase usecases.ProductUsecase
 }
 
-func NewProductController(productService ports.ProductService) ProductController {
+func NewProductController(productUsecase usecases.ProductUsecase) ProductController {
 	return ProductController{
-		productService: productService,
+		productUsecase: productUsecase,
 	}
 }
 
@@ -49,7 +49,7 @@ func (c ProductController) CreateProducts(ctx *gin.Context) {
 		return
 	}
 
-	err = c.productService.CreateProduct(product)
+	err = c.productUsecase.CreateProduct(product)
 	if err != nil {
 		handleInternalServerResponse(ctx, "failed to create product", err)
 		return
@@ -78,7 +78,7 @@ func (c ProductController) UpdateProduct(ctx *gin.Context) {
 		return
 	}
 
-	err = c.productService.UpdateProduct(id, product)
+	err = c.productUsecase.UpdateProduct(id, product)
 	if err != nil {
 		if errors.Is(err, sql.ErrNotFound) {
 			handleNotFoundResponse(ctx, "product not found", err)
@@ -98,7 +98,7 @@ func (c ProductController) DeleteProduct(ctx *gin.Context) {
 		return
 	}
 
-	err := c.productService.DeleteProduct(id)
+	err := c.productUsecase.DeleteProduct(id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNotFound) {
 			handleNotFoundResponse(ctx, "product not found", err)
@@ -112,7 +112,7 @@ func (c ProductController) DeleteProduct(ctx *gin.Context) {
 }
 
 func (c ProductController) getAllProducts(ctx *gin.Context, pageParameters dto.PageParams) {
-	products, err := c.productService.GetAllProducts(pageParameters)
+	products, err := c.productUsecase.GetAllProducts(pageParameters)
 	if err != nil {
 		handleInternalServerResponse(ctx, "failed to get all products", err)
 		return
@@ -121,7 +121,7 @@ func (c ProductController) getAllProducts(ctx *gin.Context, pageParameters dto.P
 }
 
 func (c ProductController) getProductsByCategory(ctx *gin.Context, pageParameters dto.PageParams, category string) {
-	products, err := c.productService.GetProductsByCategory(pageParameters, category)
+	products, err := c.productUsecase.GetProductsByCategory(pageParameters, category)
 	if err != nil {
 		handleInternalServerResponse(ctx, "failed to get products by category", err)
 		return

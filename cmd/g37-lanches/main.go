@@ -4,7 +4,7 @@ import (
 	"g37-lanchonete/configs"
 	"g37-lanchonete/internal/api"
 	"g37-lanchonete/internal/controllers"
-	"g37-lanchonete/internal/core/services"
+	"g37-lanchonete/internal/core/usecases"
 	httpDriver "g37-lanchonete/internal/infra/drivers/http"
 	paymentDriver "g37-lanchonete/internal/infra/drivers/payment"
 	sqlDriver "g37-lanchonete/internal/infra/drivers/sql"
@@ -27,14 +27,14 @@ func main() {
 	productRepositoryGateway := gateways.NewProductRepositoryGateway(postgresSQLClient)
 	orderRepositoryGateway := gateways.NewOrderRepositoryGateway(postgresSQLClient)
 
-	customerService := services.NewCustomerService(customerRepositoryGateway)
-	productService := services.NewProductService(productRepositoryGateway)
-	paymentService := services.NewPaymentService(appConfig.NotificationURL, appConfig.SponsorId, paymentBroker)
-	orderService := services.NewOrderService(customerService, paymentService, productService, orderRepositoryGateway)
+	customerUsecase := usecases.NewCustomerUsecase(customerRepositoryGateway)
+	productUsecase := usecases.NewProductUsecase(productRepositoryGateway)
+	paymentUsecase := usecases.NewPaymentUsecase(appConfig.NotificationURL, appConfig.SponsorId, paymentBroker)
+	orderUsecase := usecases.NewOrderUsecase(customerUsecase, paymentUsecase, productUsecase, orderRepositoryGateway)
 
-	customerController := controllers.NewCustomerController(customerService)
-	productController := controllers.NewProductController(productService)
-	orderController := controllers.NewOrderController(orderService)
+	customerController := controllers.NewCustomerController(customerUsecase)
+	productController := controllers.NewProductController(productUsecase)
+	orderController := controllers.NewOrderController(orderUsecase)
 
 	apiParams := api.ApiParams{
 		CustomerController: customerController,
