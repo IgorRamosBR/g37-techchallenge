@@ -83,7 +83,7 @@ Criar API Deployment
 ```
 
 ## Documentação
-[Documentation](https://github.com/IgorRamosBR/g37-techchallenge/tree/master/api)
+[Documentation](https://github.com/IgorRamosBR/g37-techchallenge/tree/master/docs)
 
 
 ## Arquitetura
