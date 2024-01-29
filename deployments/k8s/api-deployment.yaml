@@ -21,32 +21,26 @@ spec:
             - name: ENVIRONMENT
               value: dev
             - name: POSTGRES_HOST
-              value: postgres-db-service
+              value: postgres
             - name: POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
-                  name: postgres-config
+                  name: postgres-secret
                   key: POSTGRES_DB
             - name: POSTGRES_USER
               valueFrom:
                 configMapKeyRef:
-                  name: postgres-config
+                  name: postgres-secret
                   key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 configMapKeyRef:
-                  name: postgres-config
+                  name: postgres-secret
                   key: POSTGRES_PASSWORD
             - name: POSTGRES_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: postgres-config
-                  key: POSTGRES_PORT
+              value: '5432'
             - name: POSTGRES_SSLMODE
-              valueFrom:
-                configMapKeyRef:
-                  name: postgres-config
-                  key: POSTGRES_SSLMODE
+              value: disable
                 
           resources:
             limits:
