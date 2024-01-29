@@ -6,7 +6,6 @@ services:
       - 5432:5432
     volumes:
       - ~/apps/postgres:/var/lib/postgresql/data
-      - ./scripts/sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
     environment:
       - POSTGRES_PASSWORD=admin
       - POSTGRES_USER=admin
