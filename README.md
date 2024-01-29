@@ -8,7 +8,7 @@ Serviço de controle de pedidos desenvolvido em Golang.
 
 **API:** Go
 
-**Infra:** PostgreSQL, SQS
+**Infra:** PostgreSQL
 
 <br/>
 
