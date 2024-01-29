@@ -48,7 +48,7 @@ func (u paymentUsecase) createPaymentRequest(order entities.Order) dto.PaymentQR
 	return dto.PaymentQRCodeRequest{
 		ExternalReference: strconv.FormatUint(uint64(order.ID), 10),
 		Title:             fmt.Sprintf("Order %d for the Customer[%d]", order.ID, order.Customer.ID),
-		NotificationURL:   u.notificationUrl,
+		NotificationURL:   fmt.Sprintf("%s/orders/%d/payment", u.notificationUrl, order.ID),
 		TotalAmount:       order.TotalAmount,
 		Items:             items,
 		Sponsor:           u.sponsorId,

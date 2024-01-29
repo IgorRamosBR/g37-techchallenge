@@ -1,4 +1,4 @@
 paymentBroker:
   url: https://api.mercadopago.com/instore/orders/qr/seller/collectors/teste/pos/123/qrs
-  notificationUrl: https://g37-lanches/payment
+  notificationUrl: https://g37-lanches
   sponsorId: "12345"

@@ -71,6 +71,10 @@ func createPostgresSQLClient(appConfig configs.AppConfig) sqlDriver.SQLClient {
 
 func performMigrations(client sqlDriver.SQLClient) error {
 	driver, err := postgres.WithInstance(client.GetConnection(), &postgres.Config{})
+	if err != nil {
+		return err
+	}
+
 	m, err := migrate.NewWithDatabaseInstance(
 		"file://./migrations",
 		"postgres", driver)
