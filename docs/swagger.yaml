@@ -25,9 +25,81 @@ tags:
   - name: product
     description: Operações sobre os produtos
   - name: orders
-    description: Operações sobre as ordens
+    description: Operações sobre as ordens de pedido e pagamento
 
 paths:
+  /customers:
+    post:
+      tags:
+        - customers
+      summary: Cadastrar cliente
+      operationId: createCustomer
+      requestBody:
+        description: Objeto do cliente criado
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Bruno
+                cpf:
+                  type: string
+                  example: '83397074690'
+                email:
+                  type: string
+                  example: bruno.carneiro@glive.com
+      responses:
+        '200':
+          description: 'OK'
+      
+    get:
+      tags:
+        - customers
+      summary: Buscar clientes através do CPF ou id
+      parameters:
+      - in: query
+        name: cpf
+        schema:
+          type: string
+          example: '83397074690'
+        required: false
+      - in: query
+        name: id
+        schema:
+          type: number
+          example: '1'
+        required: false
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    example: 1
+                  createdAt:
+                    type: string
+                    example: '2023-10-31T10:41:38.816861Z'
+                  updatedAt:
+                    type: string
+                    example: '2023-10-31T10:41:38.816861Z'
+                  name:
+                    type: string
+                    example: 'Bruno'
+                  cpf:
+                    type: string
+                    example: '83397074690'
+                  email:
+                    type: string
+                    example: 'bruno.carneiro@live.com'
+
+  
   /product:
     post:
       tags:
@@ -65,7 +137,7 @@ paths:
     get:
       tags:
         - product
-      summary: Busca por categoria
+      summary: Buscar todos os produtos ou por categoria
       description: Procurar um produto por categoria
       operationId: GetProductsByCategory
       parameters:
@@ -74,8 +146,7 @@ paths:
         schema:
           type: string
           example: 'Combo'
-          enum: [category]
-        required: true
+        required: false
       - in: query
         name: limit
         description: número de resultados por página
@@ -222,7 +293,7 @@ paths:
       tags:
         - orders
       summary: Criar um pedido
-      description: Criar pedidos com itens unitários, combos prontos ou combos personalizados. Sendo que os itens unitários e os combos prontos, a lista de productIds deverá conter apenas um único ID.
+      description: Criar pedidos com itens unitários, combos prontos ou combos personalizados. Sendo que para os itens unitários e os combos prontos, a lista de productIds deverá conter apenas um único ID.
       operationId: createOrdersCustom
       requestBody:
         content:
@@ -264,11 +335,15 @@ paths:
       responses:
         '200':
           description: 'OK'
+    
+    
+    
+    
     get:
       tags:
         - orders
-      summary: Buscar ordens cadastradas
-      description: Buscar todas as ordens cadastradas.
+      summary: Buscar pedidos cadastrados
+      description: Buscar todos os pedidos cadastrados
       operationId: getAllOrders
       parameters:
       - in: query
@@ -371,47 +446,26 @@ paths:
                   next:
                     type: number
                     example: 1
-          
-  
-  
-  
-  /customers:
-    post:
-      tags:
-        - customers
-      summary: Cadastrar cliente
-      operationId: createCustomer
-      requestBody:
-        description: Objeto do cliente criado
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  example: Bruno
-                cpf:
-                  type: string
-                  example: '83397074690'
-                email:
-                  type: string
-                  example: bruno.carneiro@glive.com
-      responses:
-        '200':
-          description: 'OK'
-      
+ 
+ 
+
+ 
+  /get/{id}/status:
     get:
       tags:
-        - customers
-      summary: Buscar clientes através do CPF
+        - orders
+      summary: Burcar status do pedido
+      description: Buscar pelo status do pedido através do seu respectivo id
+      operationId: GetOrderStatus
       parameters:
-      - in: query
-        name: cpf
-        schema:
-          type: string
-          example: '83397074690'
-        required: true
+        - name: id
+          in: path
+          description: ID 
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 4
       responses:
         '200':
           description: 'OK'
@@ -420,23 +474,101 @@ paths:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: integer
-                    format: int64
-                    example: 1
-                  createdAt:
-                    type: string
-                    example: '2023-10-31T10:41:38.816861Z'
-                  updatedAt:
-                    type: string
-                    example: '2023-10-31T10:41:38.816861Z'
                   name:
                     type: string
-                    example: 'Bruno'
-                  cpf:
+                    example: "Batata frita"
+                  skuId:
                     type: string
-                    example: '83397074690'
-                  email:
+                    example: "000001"
+                  description:
                     type: string
-                    example: 'bruno.carneiro@live.com'
+                    example: "Deliciosa batata frita"
+                  category:
+                    type: string
+                    example: "Acompanhamento"
+                  price:
+                    type: number
+                    format: double
+                    example: 16.00    
     
+    
+    
+    
+  /orders/{id}/status: 
+   put:
+      tags:
+        - orders
+      summary: Atualizar status do pedido
+      description: Atualizar o status de um pedido através do seu id
+      operationId: updateOrder
+      parameters: 
+        - name: id
+          in: path
+          description: ID do pedido
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 4
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: "CREATED|PAID|RECEIVED|IN_PROGRESS|READY|DONE"
+      responses:
+        '200':
+          description: 'OK'
+          
+  /orders/{id}/payment:
+    put:
+      tags:
+        - orders
+      summary: Atualizar pagamento de um pedido
+      description: Atualizar o pagamento de um pedido
+      operationId: CreateOrderPayment
+      parameters: 
+        - name: id
+          in: path
+          description: ID do pedido que terá o pagamento atualizado
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 4
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Id:
+                  type: string
+                  example: "1"
+                LiveMode:
+                  type: boolean
+                  example: true
+                Type:
+                  type: string
+                  example: "payment"
+                DateCreated:
+                  type: string
+                  example: "2024-01-29T12:00:00Z"
+                UserId:
+                  type: integer
+                  example: 1    
+                ApiVersion:
+                  type: string
+                  example: "v1"
+                Action:
+                  type: string
+                  example: "paymentAction"
+                Data:
+                  type: string
+                  example: "Id"                      
+      responses:
+        '200':
+          description: 'OK'
