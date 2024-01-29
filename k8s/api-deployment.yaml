@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: g37-lanches-api
-          image: igorramos/g37-lanches-api:v1.0.2
+          image: igorramos/g37-lanches-api:v1.0.3
           ports:
             - containerPort: 8080
           env:
