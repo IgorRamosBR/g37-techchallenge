@@ -10,6 +10,10 @@ import (
 	paymentDriver "g37-lanchonete/internal/infra/drivers/payment"
 	sqlDriver "g37-lanchonete/internal/infra/drivers/sql"
 	"g37-lanchonete/internal/infra/gateways"
+
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 func main() {
@@ -21,6 +25,10 @@ func main() {
 
 	httpClient := httpDriver.NewHttpClient()
 	postgresSQLClient := createPostgresSQLClient(appConfig)
+	err = performMigrations(postgresSQLClient)
+	if err != nil {
+		panic(err)
+	}
 
 	paymentBroker := paymentDriver.NewMercadoPagoBroker(httpClient, appConfig.PaymentBrokerURL)
 
@@ -59,4 +67,16 @@ func createPostgresSQLClient(appConfig configs.AppConfig) sqlDriver.SQLClient {
 	}
 
 	return db
+}
+
+func performMigrations(client sqlDriver.SQLClient) error {
+	driver, err := postgres.WithInstance(client.GetConnection(), &postgres.Config{})
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://./migrations",
+		"postgres", driver)
+	if err != nil {
+		return err
+	}
+
+	return m.Up()
 }

@@ -19,6 +19,7 @@ RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -
 # Copy the binary to the production image from the builder stage.
 COPY --from=builder /app/bin/main /app/main
 COPY --from=builder /app/configs /configs
+COPY --from=builder /app/migrations /migrations
 
 EXPOSE 8080
 

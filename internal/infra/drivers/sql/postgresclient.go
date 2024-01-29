@@ -49,3 +49,7 @@ func (client sqlClient) Ping() error {
 	err := client.db.Ping()
 	return err
 }
+
+func (client sqlClient) GetConnection() *sql.DB {
+	return client.db
+}

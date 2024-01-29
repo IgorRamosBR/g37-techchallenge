@@ -1,6 +1,9 @@
 package sql
 
-import "errors"
+import (
+	"database/sql"
+	"errors"
+)
 
 var ErrNotFound = errors.New("entity not found")
 
@@ -11,4 +14,5 @@ type SQLClient interface {
 	ExecWithReturn(query string, args ...any) RowWrapper
 	Begin() (TransactionWrapper, error)
 	Ping() error
+	GetConnection() *sql.DB
 }
