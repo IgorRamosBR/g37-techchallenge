@@ -7,6 +7,6 @@ metadata:
 data:
   POSTGRES_DB: postgres
   POSTGRES_PASSWORD: cG9zdGdyZXMK
-  POSTGRES_USER: admin
+  POSTGRES_USER: postgres
   POSTGRES_PORT: "5432"
   POSTGRES_SSLMODE: disable
