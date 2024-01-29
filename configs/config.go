@@ -83,12 +83,12 @@ func (c *Config) extractConfigVars() (AppConfig, error) {
 
 	appConfig.Environment = c.viper.GetString("ENVIRONMENT")
 
-	appConfig.DatabaseHost = c.viper.GetString("postgres.host")
-	appConfig.DatabasePort = c.viper.GetString("postgres.port")
-	appConfig.DatabaseName = c.viper.GetString("postgres.dbname")
-	appConfig.DatabaseSSLMode = c.viper.GetString("postgres.sslmode")
-	appConfig.DatabaseUser = c.viper.GetString("postgres.user")
-	appConfig.DatabasePassword = c.viper.GetString("postgres.password")
+	appConfig.DatabaseHost = c.viper.GetString("POSTGRES_HOST")
+	appConfig.DatabasePort = c.viper.GetString("POSTGRES_PORT")
+	appConfig.DatabaseName = c.viper.GetString("POSTGRES_DB")
+	appConfig.DatabaseSSLMode = c.viper.GetString("POSTGRES_SSLMODE")
+	appConfig.DatabaseUser = c.viper.GetString("POSTGRES_USER")
+	appConfig.DatabasePassword = c.viper.GetString("POSTGRES_PASSWORD")
 
 	appConfig.PaymentBrokerURL = c.viper.GetString("paymentBroker.url")
 	appConfig.NotificationURL = c.viper.GetString("paymentBroker.notificationUrl")
