@@ -13,7 +13,13 @@
             "program": "${fileDirname}",
             "env": {
                 "ENVIRONMENT": "dev",
-                "CONFIG_DIR_PATH": "../../configs"
+                "CONFIG_DIR_PATH": "../../configs",
+                "POSTGRES_HOST": "localhost",
+                "POSTGRES_DB": "g37_lanches",
+                "POSTGRES_USER": "admin",
+                "POSTGRES_PASSWORD": "admin",
+                "POSTGRES_PORT": "5432",
+                "POSTGRES_SSLMODE": "disable"
             }
         }
     ]

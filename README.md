@@ -105,3 +105,6 @@ Clean Architecture com a estrutura de pastas baseada no [Standard Go Project Lay
 ├── k8s
 ├── migrations
 ```
+
+## Arquitetura na AWS
+<img title="AWS Arch" alt="AWS Architecture" src="./cloud-architecture.jpeg">
